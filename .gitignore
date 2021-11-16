@@ -1,0 +1,14 @@
+.DS_Store
+.idea/
+.vs/
+.vscode/
+cmake-build-*/
+build-*/
+build/
+tags
+out/
+CMakeSettings.json
+vcpkg_installed/
+CMakePresets.json
+*.DotSettings.user
+.cache

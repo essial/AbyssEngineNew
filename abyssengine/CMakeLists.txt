@@ -1,0 +1,144 @@
+cmake_minimum_required(VERSION 3.20)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(APP_NAME "abyssengine")
+
+project(abyssengine CXX)
+
+find_package(ZLIB REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
+find_package(PNG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(ICU REQUIRED COMPONENTS uc dt in io)
+find_package(Lua 5.4 EXACT REQUIRED)
+find_package(Threads REQUIRED)
+find_package(FFmpeg COMPONENTS AVCODEC AVFORMAT AVUTIL SWSCALE SWRESAMPLE POSTPROC REQUIRED)
+find_package(sdl2-ttf)
+find_package(absl CONFIG REQUIRED)
+
+if (NOT sdl2-ttf_FOUND)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SDL2TTF REQUIRED IMPORTED_TARGET SDL2_ttf)
+    add_library(SDL2::SDL2_ttf ALIAS PkgConfig::SDL2TTF)
+endif ()
+
+include(../cmake/CPM.cmake)
+CPMAddPackage("https://github.com/ladislav-zezula/CascLib.git#85800c22281fe6827c61e8d9ebc9ca83d161d901")
+
+if (APPLE)
+    find_library(OSX_VIDEOTOOLBOX VideoToolbox)
+    find_library(OSX_COREMEDIA CoreMedia)
+    find_library(OSX_SECURITY Security)
+endif ()
+
+
+if (MSVC)
+    set(OPTIONS WIN32)
+    set(SOURCE_EXTRA resource.rc)
+    set(APP_NAME "AbyssEngine")
+    add_definitions(-DCASCLIB_NO_AUTO_LINK_LIBRARY -D_CRT_SECURE_NO_WARNINGS)
+endif (MSVC)
+
+if (APPLE)
+    set(APP_NAME "Abyss Engine")
+    set_source_files_properties(abyssbadge.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set(OPTIONS
+            MACOSX_BUNDLE
+            ./abyssbadge.icns src/abyssengine.cpp)
+endif (APPLE)
+
+
+add_executable(${PROJECT_NAME} ${OPTIONS})
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+add_definitions(-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE -DSPDLOG_DEBUG_ON -DSPDLOG_TRACE_ON)
+endif(CMAKE_BUILD_TYPE MATCHES Debug)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        FOLDER "Applications/"
+        BUNDLE TRUE
+        MACOSX_BUNDLE_GUI_IDENTIFIER ${APP_NAME}
+        MACOSX_PRODUCT_BUNDLE_IDENTIFIER abyssengine
+        PRODUCT_BUNDLE_IDENTIFIER ABYSSENGINE
+        OUTPUT_NAME ${APP_NAME}
+        MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME}
+        CPACK_BUNDLE_APPLE_ENTITLEMENTS "macos.entitlements"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${abyss_VERSION_MAJOR}.${abyss_VERSION_MINOR}"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${abyss_VERSION_MAJOR}.${abyss_VERSION_MINOR}"
+        MACOSX_BUNDLE_ICON_FILE abyssbadge.icns
+        )
+
+configure_file(
+        ${CMAKE_SOURCE_DIR}/config.h.in
+        ${PROJECT_BINARY_DIR}/config.h
+)
+
+target_compile_options(${PROJECT_NAME} PRIVATE ${FFMPEG_DEFINITIONS})
+
+file(GLOB_RECURSE CASC_SOURCES "${CascLib_SOURCE_DIR}/src/*.cpp")
+
+target_sources(${PROJECT_NAME} PRIVATE
+        # Engine Core --------------------------------------------------
+        src/abyssengine.cpp
+        src/engine/engine.cpp
+        src/systemio/sdl2/sdl2systemio.cpp
+        src/common/inifile.cpp
+
+        # Dynamic ------------------------------------------------------
+        ${SOURCE_EXTRA}
+
+        # Others -------------------------------------------------------
+        ${SOURCE_APP}
+        ${SOURCE_EXTRA}
+        ${CASC_SOURCES}
+        ${CascLib_SOURCE_DIR}/src/jenkins/lookup3.c
+        )
+
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+        ${PROJECT_BINARY_DIR}
+        ${LUA_INCLUDE_DIR}
+        ${FFMPEG_INCLUDE_DIRS}
+        ${ICU_INCLUDE_DIRS}
+        ${CascLib_SOURCE_DIR}/src
+        )
+
+target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+        #libabyss
+        absl::city absl::config absl::core_headers absl::endian absl::fixed_array absl::strings absl::optional absl::variant absl::utility absl::base absl::any absl::bits absl::int128 absl::hash absl::flat_hash_set
+        Threads::Threads
+        SDL2::SDL2main
+        SDL2::SDL2
+        SDL2::SDL2_ttf
+        PNG::PNG
+        ICU::uc ICU::dt ICU::in ICU::io
+        spdlog::spdlog spdlog::spdlog_header_only
+        ${FFMPEG_LIBRARIES}
+        ${LUA_LIBRARIES}
+        )
+
+if (UNIX)
+    if (APPLE)
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${OSX_VIDEOTOOLBOX} ${OSX_COREMEDIA} ${OSX_SECURITY})
+    else ()
+        target_link_libraries(${PROJECT_NAME} PRIVATE avformat avcodec swscale avutil swresample avdevice m z)
+    endif ()
+endif ()
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32) # for CASC
+    install(TARGETS ${PROJECT_NAME}
+            RUNTIME_DEPENDENCIES
+            PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+            DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}
+            LIBRARY DESTINATION bin
+            ARCHIVE DESTINATION bin
+            )
+endif (WIN32)
+
+if (UNIX AND NOT APPLE)
+    install(TARGETS ${PROJECT_NAME})
+endif (UNIX AND NOT APPLE)
