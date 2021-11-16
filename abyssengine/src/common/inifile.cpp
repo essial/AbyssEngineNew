@@ -13,18 +13,18 @@ AbyssEngine::Common::INIFile::INIFile(const std::filesystem::path &iniFilePath) 
         throw std::runtime_error("file not found");
 
 
-    auto fileString = std::string((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
+    std::string fileString((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
     auto lines = absl::StrSplit(fileString, "\n");
 
     std::string currentCategory;
 
     auto lineIdx = 0;
-    for (auto line : lines) {
+    for (const auto &lineSrc : lines) {
         lineIdx++;
 
-        line = absl::StripAsciiWhitespace(line);
+        auto line = absl::StripAsciiWhitespace(lineSrc);
 
-        if (line.length() == 0)
+        if (line.empty())
             continue;
 
         if (line.front() == '[') {

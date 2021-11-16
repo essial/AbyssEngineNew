@@ -55,7 +55,7 @@ void LibAbyss::Crypto::DecryptBytes(std::span<uint8_t> data, uint32_t seed) {
     }
 }
 
-uint32_t LibAbyss::Crypto::HashString(const std::string &key, uint32_t hashType) {
+uint32_t LibAbyss::Crypto::HashString(std::string_view key, uint32_t hashType) {
     uint32_t seed1 = 0x7FED7FED;
     uint32_t seed2 = 0xEEEEEEEE;
 
@@ -76,7 +76,7 @@ uint64_t LibAbyss::Crypto::HashFileName(const std::string &key) {
     return (((uint64_t) a) << 32) | ((uint64_t) b);
 }
 
-std::span<uint32_t> LibAbyss::Crypto::DecryptTableFromFile(std::ifstream &source, uint32_t size, std::string name) {
+std::vector<uint32_t> LibAbyss::Crypto::DecryptTableFromFile(std::ifstream &source, uint32_t size, std::string_view name) {
     uint32_t seed = HashString(name, 3);
     uint32_t seed2 = 0xEEEEEEEE;
     size *= 4;

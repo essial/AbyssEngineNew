@@ -13,9 +13,9 @@ namespace LibAbyss {
 
         static void DecryptBytes(std::span<uint8_t> data, uint32_t seed);
 
-        static uint32_t HashString(const std::string &key, uint32_t hashType);
+        static uint32_t HashString(std::string_view key, uint32_t hashType);
 
-        static std::span<uint32_t> DecryptTableFromFile(std::ifstream &source, uint32_t size, std::string name);
+        static std::vector<uint32_t> DecryptTableFromFile(std::ifstream &source, uint32_t size, std::string_view name);
 
         static void Initialize();
 

@@ -19,11 +19,13 @@ int main(int, char *argv[]) {
 
     try {
         auto configPath = GetConfigPath(argv[0]);
-        auto iniFile = std::make_unique<AbyssEngine::Common::INIFile>(configPath);
+
+        AbyssEngine::Common::INIFile iniFile(configPath);
         std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo = std::make_unique<AbyssEngine::SystemIO::SDL2::SDL2SystemIO>();
 
-        auto engine = std::make_unique<AbyssEngine::Engine::Engine>(iniFile, systemIo);
-        engine->Run();
+        AbyssEngine::Engine engine(iniFile, std::move(systemIo));
+        engine.Run();
+
     } catch (std::exception &ex) {
         SPDLOG_CRITICAL(ex.what());
         return EXIT_FAILURE;

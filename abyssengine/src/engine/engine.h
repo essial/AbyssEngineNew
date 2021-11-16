@@ -6,11 +6,11 @@
 #include "../common/inifile.h"
 #include "../systemio/interface.h"
 
-namespace AbyssEngine::Engine {
+namespace AbyssEngine {
 
     class Engine {
     public:
-        Engine(std::unique_ptr<AbyssEngine::Common::INIFile> &iniFile, std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> &systemIo);
+        Engine(AbyssEngine::Common::INIFile &iniFile, std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo);
 
         ~Engine();
 
@@ -20,7 +20,7 @@ namespace AbyssEngine::Engine {
     private:
         const std::filesystem::path _basePath;
         std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> _systemIO;
-        std::unique_ptr<AbyssEngine::Common::INIFile> _iniFile;
+        AbyssEngine::Common::INIFile _iniFile;
     };
 
 }

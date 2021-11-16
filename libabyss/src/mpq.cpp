@@ -4,11 +4,13 @@
 #include <spdlog/spdlog.h>
 
 LibAbyss::MPQ::MPQ(std::ifstream source) : _header(), _blockEntries(), _hashEntries() {
+    source.seekg(0, std::ios_base::beg);
+
     // Read in the MPQ header
     source.read((char *) &_header, sizeof(MPQHeader));
 
     // Verify the magic header
-    if (std::string((char *) &_header.Magic[0], 4) != "MPQ\x1A") {
+    if (std::string_view((char *) &_header.Magic[0], 4) != "MPQ\x1A") {
         throw std::runtime_error("Invalid MPQ header");
     }
 
@@ -28,6 +30,6 @@ LibAbyss::MPQ::MPQ(std::ifstream source) : _header(), _blockEntries(), _hashEntr
     auto blockData = LibAbyss::Crypto::DecryptTableFromFile(source, _header.HashTableEntries, "(block table)");
     for (auto i = 0, n = 0; i < _header.BlockTableEntries; i++, n += 4) {
         _blockEntries.push_back({(uint32_t) blockData[n], (uint32_t) blockData[n + 1], (uint32_t) blockData[n + 2],
-                                 (BlockFlag::BlockFlag) blockData[n + 3]});
+                                 (BlockFlag) blockData[n + 3]});
     }
 }
