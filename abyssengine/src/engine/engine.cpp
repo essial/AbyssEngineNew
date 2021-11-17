@@ -2,7 +2,7 @@
 #include <spdlog/spdlog.h>
 
 
-AbyssEngine::Engine::Engine(AbyssEngine::Common::INIFile &iniFile, std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo) :
+AbyssEngine::Engine::Engine(AbyssEngine::Common::INIFile iniFile, std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo) :
         _iniFile(std::move(iniFile)), _systemIO(std::move(systemIo)) {
     SPDLOG_TRACE("creating engine");
 

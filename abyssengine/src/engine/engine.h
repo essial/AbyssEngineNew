@@ -10,7 +10,7 @@ namespace AbyssEngine {
 
     class Engine {
     public:
-        Engine(AbyssEngine::Common::INIFile &iniFile, std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo);
+        Engine(AbyssEngine::Common::INIFile iniFile, std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo);
 
         ~Engine();
 
