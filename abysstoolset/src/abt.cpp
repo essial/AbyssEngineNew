@@ -10,6 +10,40 @@ void ExtractMPQ(std::string_view mpqFile, const std::filesystem::path &outputPat
 
     if (!exists(outputPath))
         std::filesystem::create_directories(outputPath);
+
+    LibAbyss::MPQ mpq(mpqFile);
+
+    for (const auto& line : mpq.FileList()) {
+
+        if (!mpq.HasFile(line))
+            continue;
+
+        std::string destFile = line;
+        std::replace(destFile.begin(), destFile.end(), '\\', '/');
+        std::filesystem::path sourcePath = line;
+        auto filePath = (outputPath / destFile).make_preferred();
+
+        long x;
+        try {
+            std::ofstream writeFile(filePath.c_str(), std::ios::out | std::ios::binary);
+            auto readFile = mpq.Load(line);
+            SPDLOG_INFO("Extracting {0}", filePath.c_str());
+            if (!exists(filePath.remove_filename()))
+                std::filesystem::create_directories(filePath.remove_filename());
+
+            auto size = readFile.in_avail();
+            char buff[size];
+            readFile.sgetn(buff, size);
+            writeFile.write(buff, size);
+
+
+        } catch (std::exception &ex) {
+            SPDLOG_ERROR("Error reading {0}", filePath.c_str());
+        }
+
+    }
+
+
 }
 
 void ListMPQ(std::string_view mpqFile) {
