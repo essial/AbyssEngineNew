@@ -5,7 +5,7 @@
 #include <absl/strings/str_split.h>
 
 AbyssEngine::Common::INIFile::INIFile(const std::filesystem::path &iniFilePath) {
-    SPDLOG_TRACE("creating ini file from '{0}'", iniFilePath.c_str());
+    SPDLOG_TRACE("creating ini file from '{0}'", iniFilePath.string());
 
     std::ifstream input_file(iniFilePath);
 

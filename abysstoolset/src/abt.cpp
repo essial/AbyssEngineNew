@@ -25,9 +25,9 @@ void ExtractMPQ(std::string_view mpqFile, const std::filesystem::path &outputPat
 
         long x;
         try {
-            std::ofstream writeFile(filePath.c_str(), std::ios::out | std::ios::binary);
+            std::ofstream writeFile(filePath.string(), std::ios::out | std::ios::binary);
             auto readFile = mpq.Load(line);
-            SPDLOG_INFO("Extracting {0}", filePath.c_str());
+            SPDLOG_INFO("Extracting {0}", filePath.string());
             if (!exists(filePath.remove_filename()))
                 std::filesystem::create_directories(filePath.remove_filename());
 
@@ -46,7 +46,7 @@ void ExtractMPQ(std::string_view mpqFile, const std::filesystem::path &outputPat
 
 
         } catch (std::exception &ex) {
-            SPDLOG_ERROR("Error reading {0}", filePath.c_str());
+            SPDLOG_ERROR("Error reading {0}", filePath.string());
         }
 
     }

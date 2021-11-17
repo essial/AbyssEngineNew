@@ -10,7 +10,6 @@ find_package(ZLIB REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(PNG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-find_package(ICU REQUIRED COMPONENTS uc dt in io)
 find_package(Lua 5.4 EXACT REQUIRED)
 find_package(Threads REQUIRED)
 find_package(FFmpeg COMPONENTS AVCODEC AVFORMAT AVUTIL SWSCALE SWRESAMPLE POSTPROC REQUIRED)
@@ -100,7 +99,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${PROJECT_BINARY_DIR}
         ${LUA_INCLUDE_DIR}
         ${FFMPEG_INCLUDE_DIRS}
-        ${ICU_INCLUDE_DIRS}
         ${CascLib_SOURCE_DIR}/src
         )
 
@@ -113,7 +111,6 @@ target_link_libraries(${PROJECT_NAME}
         SDL2::SDL2
         SDL2::SDL2_ttf
         PNG::PNG
-        ICU::uc ICU::dt ICU::in ICU::io
         spdlog::spdlog spdlog::spdlog_header_only
         ${FFMPEG_LIBRARIES}
         ${LUA_LIBRARIES}

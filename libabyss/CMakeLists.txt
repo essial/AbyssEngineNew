@@ -9,7 +9,6 @@ include(GNUInstallDirs)
 
 find_package(ZLIB REQUIRED)
 find_package(BZip2 REQUIRED)
-find_package(ICU REQUIRED COMPONENTS uc dt in io)
 find_package(stormlib CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME}
@@ -32,7 +31,6 @@ target_link_libraries(${PROJECT_NAME}
         ZLIB::ZLIB
         BZip2::BZip2
         stormlib::stormlib
-        ${ICU_INCLUDE_DIRS}
         ${CMAKE_THREAD_LIBS_INIT}
         )
 
