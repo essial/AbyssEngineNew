@@ -33,7 +33,7 @@ AbyssEngine::Common::INIFile::INIFile(const std::filesystem::path &iniFilePath) 
                 continue;
             }
 
-            currentCategory = AsciiStrToLower(line.substr(1, line.length()-2));
+            currentCategory = absl::AsciiStrToLower(line.substr(1, line.length()-2));
 
             continue;
         }

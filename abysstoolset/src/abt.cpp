@@ -1,10 +1,11 @@
 #include "config.h"
-#include <libabyss/crypto.h>
+#include "libabyss/mpqstream.h"
 #include <argh.h>
 #include <cstdlib>
 #include <filesystem>
 #include <spdlog/spdlog.h>
 #include <libabyss/mpq.h>
+#include <fstream>
 
 void ExtractMPQ(std::string_view mpqFile, const std::filesystem::path &outputPath) {
     SPDLOG_INFO("Extracting {0} to {1}", mpqFile, outputPath.string());
@@ -20,6 +21,14 @@ void ListMPQ(std::string_view mpqFile) {
     SPDLOG_INFO("Listing contents of {0}", mpqPath.string());
 
     LibAbyss::MPQ mpq(mpqPath);
+
+    if (!mpq.HasFile("(listfile)")) {
+        SPDLOG_ERROR("MPQ does not contain a listfile.");
+    }
+
+    auto stream = mpq.Load("(listfile)");
+    std::istream source(&stream);
+    SPDLOG_INFO(std::string(std::istreambuf_iterator<char>(source), {}));
 }
 
 void ListMPQContents(std::string_view mpqFile) { SPDLOG_INFO("Listing contents of {0}:", mpqFile); }

@@ -7,8 +7,10 @@
         "argh",
         "abseil",
         "libpng",
+        "bzip2",
         "zlib",
         "sdl2",
+        "stormlib",
         "sdl2-ttf",
         "lua",
         {
