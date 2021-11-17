@@ -8,6 +8,7 @@
 #include <mutex>
 #include <StormLib.h>
 #include <istream>
+#include <filesystem>
 
 namespace LibAbyss {
 
