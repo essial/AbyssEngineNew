@@ -62,7 +62,8 @@ void LibAbyss::MPQStream::BufferData() {
     }
 
     auto streamPos = (_streamCurrent - _begin);
-    auto toRead = std::min(MPQ_STREAM_READ_MAX, (int) (_end - _current));
+    auto remaining = (int) (_end - _current);
+    auto toRead = remaining < MPQ_STREAM_READ_MAX ? remaining : MPQ_STREAM_READ_MAX;
     DWORD amountRead;
     if (!SFileReadFile(_mpqFile, _fileData.data() + streamPos, toRead, &amountRead, nullptr)) {
         if (GetLastError() == ERROR_HANDLE_EOF) {
