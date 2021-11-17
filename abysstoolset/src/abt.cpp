@@ -31,10 +31,18 @@ void ExtractMPQ(std::string_view mpqFile, const std::filesystem::path &outputPat
             if (!exists(filePath.remove_filename()))
                 std::filesystem::create_directories(filePath.remove_filename());
 
-            auto size = readFile.in_avail();
-            char buff[size];
-            readFile.sgetn(buff, size);
-            writeFile.write(buff, size);
+            auto dataLeft = readFile.in_avail();
+
+            char buff[4096];
+            while (dataLeft > 0) {
+                auto toWrite = std::min(4096, (int)dataLeft);
+                readFile.sgetn(buff, toWrite);
+                writeFile.write(buff, toWrite);
+                dataLeft -= toWrite;
+            }
+
+
+
 
 
         } catch (std::exception &ex) {
