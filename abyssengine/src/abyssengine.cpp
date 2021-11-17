@@ -7,34 +7,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-std::filesystem::path GetConfigPath(std::string_view exePath);
-
-int main(int, char *argv[]) {
-    SPDLOG_INFO(ABYSS_VERSION_STRING);
-
-#ifndef NDEBUG
-    spdlog::set_level(spdlog::level::trace);
-#endif
-
-
-    try {
-        auto configPath = GetConfigPath(argv[0]);
-
-        AbyssEngine::Common::INIFile iniFile(configPath);
-        std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo = std::make_unique<AbyssEngine::SystemIO::SDL2::SDL2SystemIO>();
-
-        AbyssEngine::Engine engine(iniFile, std::move(systemIo));
-        engine.Run();
-
-    } catch (std::exception &ex) {
-        SPDLOG_CRITICAL(ex.what());
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-std::filesystem::path GetConfigPath(std::string_view exePath) {
+static std::filesystem::path GetConfigPath(std::string_view exePath) {
     auto testPath = std::filesystem::current_path() / "config.ini";
 
     // Test working directory path
@@ -54,4 +27,29 @@ std::filesystem::path GetConfigPath(std::string_view exePath) {
         return testPath.remove_filename();
 #endif
     return {};
+}
+
+int main(int, char *argv[]) {
+    SPDLOG_INFO(ABYSS_VERSION_STRING);
+
+#ifndef NDEBUG
+    spdlog::set_level(spdlog::level::trace);
+#endif
+
+
+    try {
+        auto configPath = GetConfigPath(argv[0]);
+
+        AbyssEngine::Common::INIFile iniFile(configPath);
+        std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo = std::make_unique<AbyssEngine::SystemIO::SDL2::SDL2SystemIO>();
+
+        AbyssEngine::Engine engine(std::move(iniFile), std::move(systemIo));
+        engine.Run();
+
+    } catch (std::exception &ex) {
+        SPDLOG_CRITICAL(ex.what());
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
