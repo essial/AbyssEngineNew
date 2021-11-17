@@ -10,9 +10,13 @@ find_package(argh CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME})
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)
+if (MSVC)
+    add_compile_definitions(/std:c++20)
+endif (MSVC)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE -DSPDLOG_DEBUG_ON -DSPDLOG_TRACE_ON)
-endif(CMAKE_BUILD_TYPE MATCHES Debug)
+endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 configure_file(
         ${CMAKE_SOURCE_DIR}/config.h.in

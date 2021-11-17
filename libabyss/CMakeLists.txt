@@ -17,6 +17,10 @@ add_library(${PROJECT_NAME}
         )
 
 
+if (MSVC)
+    add_compile_definitions(/std:c++20)
+endif (MSVC)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
         FOLDER "Libraries/"
         )

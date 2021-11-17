@@ -37,6 +37,7 @@ if (MSVC)
     set(SOURCE_EXTRA resource.rc)
     set(APP_NAME "AbyssEngine")
     add_definitions(-DCASCLIB_NO_AUTO_LINK_LIBRARY -D_CRT_SECURE_NO_WARNINGS)
+    add_compile_definitions(/std:c++20)
 endif (MSVC)
 
 if (APPLE)
