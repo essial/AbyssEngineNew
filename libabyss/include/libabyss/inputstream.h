@@ -6,14 +6,16 @@
 #include <memory>
 
 namespace LibAbyss {
-class InputStream : public std::istream {
+    class InputStream : public std::istream {
     public:
-        explicit InputStream(std::unique_ptr<std::streambuf> buf) : _buf(std::move(buf)) {
-            this->init(_buf.get());
+        explicit InputStream(std::unique_ptr<std::streambuf> streamBuff) : std::istream(streamBuff.get()),
+                                                                           _streamBuff(std::move(streamBuff)) {
+            this->init(_streamBuff.get());
         }
+
     private:
-        std::unique_ptr<std::streambuf> _buf;
-};
+        std::unique_ptr<std::streambuf> _streamBuff;
+    };
 }
 
 #endif // ABYSS_INPUTSTREAM_H
