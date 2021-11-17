@@ -23,6 +23,7 @@ LibAbyss::MPQStream::~MPQStream() {
 
 
 int LibAbyss::MPQStream::underflow() {
+    BufferData();
 
     if (_current == _end)
         return traits_type::eof();
@@ -31,26 +32,7 @@ int LibAbyss::MPQStream::underflow() {
 }
 
 int LibAbyss::MPQStream::uflow() {
-    if (_current == _begin) {
-        SFileSetFilePointer(_mpqFile, 0, nullptr, FILE_BEGIN);
-    }
-
-    if (_current < _streamCurrent) {
-        return traits_type::to_int_type(*_current++);
-    }
-
-    auto streamPos = (_streamCurrent - _begin);
-    auto toRead = std::min(MPQ_STREAM_READ_MAX, (int) (_end - _current));
-    DWORD amountRead;
-    if (!SFileReadFile(_mpqFile, _fileData.data() + streamPos, toRead, &amountRead, nullptr)) {
-        if (GetLastError() == ERROR_HANDLE_EOF) {
-            return traits_type::eof();
-        }
-
-        throw std::runtime_error("Error reading file from MPQ");
-    }
-
-    _streamCurrent += amountRead;
+    BufferData();
 
     return (_current >= _end)
            ? traits_type::eof()
@@ -58,7 +40,7 @@ int LibAbyss::MPQStream::uflow() {
 }
 
 int LibAbyss::MPQStream::pbackfail(int c) {
-
+    BufferData();
 
     if (_current == _begin || (c != traits_type::eof() && c != _current[-1])) {
         return traits_type::eof();
@@ -68,4 +50,27 @@ int LibAbyss::MPQStream::pbackfail(int c) {
 
 std::streamsize LibAbyss::MPQStream::showmanyc() {
     return (_end - _current) - 1;
+}
+
+void LibAbyss::MPQStream::BufferData() {
+    if (_current == _begin) {
+        SFileSetFilePointer(_mpqFile, 0, nullptr, FILE_BEGIN);
+    }
+
+    if (_current < _streamCurrent) {
+        return;
+    }
+
+    auto streamPos = (_streamCurrent - _begin);
+    auto toRead = std::min(MPQ_STREAM_READ_MAX, (int) (_end - _current));
+    DWORD amountRead;
+    if (!SFileReadFile(_mpqFile, _fileData.data() + streamPos, toRead, &amountRead, nullptr)) {
+        if (GetLastError() == ERROR_HANDLE_EOF) {
+            return;
+        }
+
+        throw std::runtime_error("Error reading file from MPQ");
+    }
+
+    _streamCurrent += amountRead;
 }

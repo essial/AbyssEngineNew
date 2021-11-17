@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <spdlog/spdlog.h>
 #include <libabyss/mpq.h>
-#include <fstream>
 
 void ExtractMPQ(std::string_view mpqFile, const std::filesystem::path &outputPath) {
     SPDLOG_INFO("Extracting {0} to {1}", mpqFile, outputPath.string());
@@ -26,9 +25,15 @@ void ListMPQ(std::string_view mpqFile) {
         SPDLOG_ERROR("MPQ does not contain a listfile.");
     }
 
-    auto stream = mpq.Load("(listfile)");
-    std::istream source(&stream);
-    SPDLOG_INFO(std::string(std::istreambuf_iterator<char>(source), {}));
+    auto file = mpq.Load("(listfile)");
+    std::istream stream(&file);
+
+    while (!stream.eof()) {
+        std::string line;
+        stream >> line;
+        SPDLOG_INFO(line);
+    }
+
 }
 
 void ListMPQContents(std::string_view mpqFile) { SPDLOG_INFO("Listing contents of {0}:", mpqFile); }

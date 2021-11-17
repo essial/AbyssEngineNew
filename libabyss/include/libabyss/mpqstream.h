@@ -30,6 +30,8 @@ namespace LibAbyss {
         const char *_current;
         const char *_streamCurrent;
         std::vector<char> _fileData;
+
+        void BufferData();
     };
 
 }
