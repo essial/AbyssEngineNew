@@ -7,7 +7,27 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-std::filesystem::path GetConfigPath(std::string_view exePath);
+static std::filesystem::path GetConfigPath(std::string_view exePath) {
+    auto testPath = std::filesystem::current_path() / "config.ini";
+
+    // Test working directory path
+    if (exists(testPath))
+        return testPath.remove_filename();
+
+    // Test executable path
+    testPath = std::filesystem::path(exePath).remove_filename() / "config.ini";
+    if (exists(testPath))
+        return testPath.remove_filename();
+
+#ifdef __APPLE__
+    // Test OSX app package path
+    testPath = std::filesystem::current_path() / ".." / ".." / ".." / "config.ini";
+
+    if (exists(testPath))
+        return testPath.remove_filename();
+#endif
+    return {};
+}
 
 int main(int, char *argv[]) {
     SPDLOG_INFO(ABYSS_VERSION_STRING);
@@ -32,26 +52,4 @@ int main(int, char *argv[]) {
     }
 
     return EXIT_SUCCESS;
-}
-
-std::filesystem::path GetConfigPath(std::string_view exePath) {
-    auto testPath = std::filesystem::current_path() / "config.ini";
-
-    // Test working directory path
-    if (exists(testPath))
-        return testPath.remove_filename();
-
-    // Test executable path
-    testPath = std::filesystem::path(exePath).remove_filename() / "config.ini";
-    if (exists(testPath))
-        return testPath.remove_filename();
-
-#ifdef __APPLE__
-    // Test OSX app package path
-    testPath = std::filesystem::current_path() / ".." / ".." / ".." / "config.ini";
-
-    if (exists(testPath))
-        return testPath.remove_filename();
-#endif
-    return {};
 }
