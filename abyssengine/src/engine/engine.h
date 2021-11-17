@@ -19,8 +19,8 @@ namespace AbyssEngine {
 
     private:
         const std::filesystem::path _basePath;
-        std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> _systemIO;
         AbyssEngine::Common::INIFile _iniFile;
+        std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> _systemIO;
     };
 
 }
