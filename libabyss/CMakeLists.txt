@@ -9,7 +9,13 @@ include(GNUInstallDirs)
 
 find_package(ZLIB REQUIRED)
 find_package(BZip2 REQUIRED)
-find_package(stormlib CONFIG REQUIRED)
+find_package(stormlib CONFIG)
+if(NOT stormlib_FOUND)
+    find_library(STORMLIB storm REQUIRED)
+    add_library(stormlib::stormlib UNKNOWN IMPORTED)
+    set_target_properties(stormlib::stormlib PROPERTIES
+        IMPORTED_LOCATION ${STORMLIB})
+endif()
 
 add_library(${PROJECT_NAME}
         src/mpq.cpp
