@@ -35,7 +35,7 @@ void ExtractMPQ(std::string_view mpqFile, const std::filesystem::path &outputPat
 
             char buff[4096];
             while (dataLeft > 0) {
-                auto toWrite = std::min(4096, (int)dataLeft);
+                auto toWrite = (int)dataLeft < 4096 ? (int)dataLeft : 4096;
                 readFile.sgetn(buff, toWrite);
                 writeFile.write(buff, toWrite);
                 dataLeft -= toWrite;
