@@ -4,6 +4,7 @@
 
 #include <filesystem>
 #include <string>
+#include <string_view>
 #include <absl/container/flat_hash_map.h>
 
 namespace AbyssEngine::Common {
@@ -11,9 +12,9 @@ namespace AbyssEngine::Common {
     public:
         explicit INIFile(const std::filesystem::path &iniFilePath);
 
-        std::string GetValue(const std::string &category, const std::string &name);
+        std::string GetValue(std::string_view category, std::string_view name);
 
-        bool GetValueBool(const std::string &category, const std::string &name);
+        bool GetValueBool(std::string_view category, std::string_view name);
 
     private:
         absl::flat_hash_map<std::string, absl::flat_hash_map<std::string, std::string>> _values;

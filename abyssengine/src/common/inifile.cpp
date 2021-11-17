@@ -38,12 +38,12 @@ AbyssEngine::Common::INIFile::INIFile(const std::filesystem::path &iniFilePath) 
             continue;
         }
 
-        if (currentCategory.length() == 0) {
+        if (currentCategory.empty()) {
             spdlog::error("error parsing INI file '{0}' on line {1}: Values must be under a named category", iniFilePath.string(), lineIdx);
             continue;
         }
 
-        std::vector<std::string> values = absl::StrSplit(line, absl::MaxSplits('=', 1));
+        std::vector<std::string_view> values = absl::StrSplit(line, absl::MaxSplits('=', 1));
         if (values.size() < 2) {
             spdlog::error("error parsing INI file '{0}' on line {1}: Values must be in the format name=value", iniFilePath.string(), lineIdx);
             continue;
@@ -59,11 +59,11 @@ AbyssEngine::Common::INIFile::INIFile(const std::filesystem::path &iniFilePath) 
 
 }
 
-std::string AbyssEngine::Common::INIFile::GetValue(const std::string& category, const std::string& name) {
+std::string AbyssEngine::Common::INIFile::GetValue(std::string_view category, std::string_view name) {
     return _values[absl::AsciiStrToLower(category)][absl::AsciiStrToLower(name)];
 }
 
-bool AbyssEngine::Common::INIFile::GetValueBool(const std::string &category, const std::string &name) {
+bool AbyssEngine::Common::INIFile::GetValueBool(std::string_view category, std::string_view name) {
     auto value = absl::AsciiStrToLower(GetValue(category, name));
 
     return (value == "true" || value == "1" || value == "yes" || value == "y");

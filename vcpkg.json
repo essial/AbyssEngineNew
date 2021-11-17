@@ -4,7 +4,6 @@
     "dependencies": [
         "spdlog",
         "argh",
-        "abseil",
         "libpng",
         "bzip2",
         "zlib",
@@ -22,6 +21,11 @@
                 "avresample",
                 "swscale",
                 "swresample"
+            ]
+        }, {
+            "name": "abseil",
+            "features": [
+                "cxx17"
             ]
         }
     ],
