@@ -9,6 +9,7 @@
 #include <StormLib.h>
 #include <istream>
 #include <filesystem>
+#include <libabyss/inputstream.h>
 
 namespace LibAbyss {
 
@@ -24,7 +25,7 @@ namespace LibAbyss {
         ~MPQ();
 
         bool HasFile(std::string_view fileName);
-        MPQStream Load(std::string_view fileName);
+        InputStream Load(std::string_view fileName);
         std::vector<std::string> FileList();
 
     private:

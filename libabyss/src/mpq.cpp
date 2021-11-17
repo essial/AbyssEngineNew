@@ -1,5 +1,6 @@
 #include "../include/libabyss/mpq.h"
 #include "../include/libabyss/mpqstream.h"
+#include <memory>
 #include <spdlog/spdlog.h>
 
 LibAbyss::MPQ::MPQ(const std::filesystem::path &mpqPath) : _mpqPath(std::filesystem::absolute(mpqPath).string()) {
@@ -13,11 +14,12 @@ LibAbyss::MPQ::MPQ(const std::filesystem::path &mpqPath) : _mpqPath(std::filesys
 
 
 LibAbyss::MPQ::~MPQ() {
+    SFileCloseArchive(_stormMpq);
     SPDLOG_INFO("Unloaded {0}", _mpqPath);
 }
 
-LibAbyss::MPQStream LibAbyss::MPQ::Load(std::string_view fileName) {
-    return {_stormMpq, fileName};
+LibAbyss::InputStream LibAbyss::MPQ::Load(std::string_view fileName) {
+    return LibAbyss::InputStream(std::make_unique<LibAbyss::MPQStream>(_stormMpq, fileName));
 }
 
 bool LibAbyss::MPQ::HasFile(std::string_view fileName) {
@@ -31,8 +33,7 @@ std::vector<std::string> LibAbyss::MPQ::FileList() {
         SPDLOG_ERROR("MPQ does not contain a listfile.");
     }
 
-    auto file = Load("(listfile)");
-    std::istream stream(&file);
+    auto stream = Load("(listfile)");
 
     while (!stream.eof()) {
         std::string line;
