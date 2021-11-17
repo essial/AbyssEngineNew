@@ -23,3 +23,22 @@ LibAbyss::MPQStream LibAbyss::MPQ::Load(std::string_view fileName) {
 bool LibAbyss::MPQ::HasFile(std::string_view fileName) {
     return SFileHasFile(_stormMpq, (const char*)fileName.data());
 }
+
+std::vector<std::string> LibAbyss::MPQ::FileList() {
+    std::vector<std::string> result;
+
+    if (!HasFile("(listfile)")) {
+        SPDLOG_ERROR("MPQ does not contain a listfile.");
+    }
+
+    auto file = Load("(listfile)");
+    std::istream stream(&file);
+
+    while (!stream.eof()) {
+        std::string line;
+        stream >> line;
+        result.push_back(line);
+    }
+
+    return result;
+}

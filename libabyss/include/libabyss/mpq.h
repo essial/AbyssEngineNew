@@ -7,6 +7,7 @@
 #include <memory>
 #include <mutex>
 #include <StormLib.h>
+#include <istream>
 
 namespace LibAbyss {
 
@@ -23,6 +24,7 @@ namespace LibAbyss {
 
         bool HasFile(std::string_view fileName);
         MPQStream Load(std::string_view fileName);
+        std::vector<std::string> FileList();
 
     private:
         HANDLE _stormMpq;
