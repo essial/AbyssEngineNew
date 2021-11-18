@@ -17,25 +17,11 @@ namespace LibAbyss {
     protected:
         int underflow() override;
 
-        int uflow() override;
-
-        int pbackfail(int_type c) override;
-
-        std::streamsize showmanyc() override;
-
     private:
-        HANDLE _mpq;
         HANDLE _mpqFile;
-        const char *_begin;
-        const char *_end;
-        const char *_current;
-        const char *_streamCurrent;
-        std::vector<char> _fileData;
-
-        void BufferData();
+        char _buffer[2048];
     };
 
 }
-
 
 #endif //ABYSS_MPQSTREAM_H
