@@ -91,3 +91,7 @@ void AbyssEngine::SystemIO::SDL2::SDL2SystemIO::HandleSdlEvent(const SDL_Event &
         break;
     }
 }
+
+void AbyssEngine::SystemIO::SDL2::SDL2SystemIO::Stop() {
+    _runMainLoop = false;
+}

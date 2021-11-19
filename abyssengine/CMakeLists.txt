@@ -11,6 +11,7 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(PNG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(Lua 5.4 EXACT REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 find_package(FFmpeg COMPONENTS AVCODEC AVFORMAT AVUTIL SWSCALE SWRESAMPLE POSTPROC REQUIRED)
 find_package(sdl2-ttf)
@@ -31,6 +32,8 @@ if (APPLE)
     find_library(OSX_SECURITY Security)
 endif ()
 
+
+add_definitions(-DSOL_ALL_SAFETIES_ON)
 
 if (MSVC)
     set(OPTIONS WIN32)
@@ -82,8 +85,13 @@ target_sources(${PROJECT_NAME} PRIVATE
         # Engine Core --------------------------------------------------
         src/abyssengine.cpp
         src/engine/engine.cpp
+        src/engine/loader.cpp
+        src/engine/provider.cpp
+        src/engine/filesystemprovider.cpp
+        src/engine/mpqprovider.cpp
         src/systemio/sdl2/sdl2systemio.cpp
         src/common/inifile.cpp
+        src/scripting/scripthost.cpp
 
         # Dynamic ------------------------------------------------------
         ${SOURCE_EXTRA}
@@ -105,7 +113,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
-        #libabyss
+        libabyss
         absl::city absl::config absl::core_headers absl::endian absl::fixed_array absl::strings absl::optional absl::variant absl::utility absl::base absl::any absl::bits absl::int128 absl::hash absl::flat_hash_set
         Threads::Threads
         SDL2::SDL2main
@@ -113,6 +121,7 @@ target_link_libraries(${PROJECT_NAME}
         SDL2::SDL2_ttf
         PNG::PNG
         spdlog::spdlog spdlog::spdlog_header_only
+        sol2::sol2
         ${FFMPEG_LIBRARIES}
         ${LUA_LIBRARIES}
         )

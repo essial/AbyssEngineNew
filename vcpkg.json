@@ -10,7 +10,7 @@
         "sdl2",
         "stormlib",
         "sdl2-ttf",
-        "lua",
+        "sol2",
         {
             "name": "ffmpeg",
             "features": [

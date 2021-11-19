@@ -20,6 +20,9 @@ namespace AbyssEngine::SystemIO {
 
         /// Starts the main system loop.
         virtual void RunMainLoop() = 0;
+
+        // Stops the main loop
+        virtual void Stop() = 0;
     };
 
 }

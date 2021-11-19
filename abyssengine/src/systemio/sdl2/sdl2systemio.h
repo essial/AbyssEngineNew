@@ -19,6 +19,7 @@ class SDL2SystemIO : public AbyssEngine::SystemIO::ISystemIO {
     void PauseAudio(bool pause) final;
     void SetFullscreen(bool fullscreen) final;
     void RunMainLoop() final;
+    void Stop() final;
 
   private:
     SDL_Window *_sdlWindow;

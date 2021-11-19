@@ -1,6 +1,7 @@
 #ifndef ABYSS_INPUTSTREAM_H
 #define ABYSS_INPUTSTREAM_H
 
+#include <fstream>
 #include <istream>
 #include <streambuf>
 #include <memory>
@@ -13,6 +14,7 @@ namespace LibAbyss {
 
     private:
         std::unique_ptr<std::streambuf> _streamBuff;
+        std::unique_ptr<std::ifstream> _ifstream;
     };
 }
 
