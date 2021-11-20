@@ -67,8 +67,10 @@ AbyssEngine::ScriptHost::LuaLoadString(const std::string_view str, const std::st
 
     sol::load_result result = _lua.load(str, chunkName, sol::load_mode::text);
 
-    if (!result.valid())
-        return std::make_tuple(sol::nil, sol::make_object(_lua, ((sol::error) result).what()));
+    if (!result.valid()) {
+        sol::error err = result;
+        return std::make_tuple(sol::nil, sol::make_object(_lua, err.what()));
+    }
 
     sol::function func = result;
     _environment.set_on(func);
