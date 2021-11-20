@@ -86,7 +86,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/abyssengine.cpp
         src/engine/engine.cpp
         src/engine/loader.cpp
-        src/engine/provider.cpp
         src/engine/filesystemprovider.cpp
         src/engine/mpqprovider.cpp
         src/systemio/sdl2/sdl2systemio.cpp

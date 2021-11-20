@@ -2,8 +2,6 @@
 #include "filesystemprovider.h"
 #include <spdlog/spdlog.h>
 
-std::mutex AbyssEngine::Engine::_mutex;
-
 AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO::ISystemIO> systemIo) :
         _iniFile(std::move(iniFile)), _systemIO(std::move(systemIo)), _loader() {
 
@@ -16,9 +14,9 @@ AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO::I
 void AbyssEngine::Engine::Run() {
     SPDLOG_TRACE("running engine");
     _loader.AddProvider(std::move(std::make_unique<FileSystemProvider>(std::filesystem::current_path())));
-    std::thread _scriptingThread([this] { ScriptingThreadBootstrap(); });
+    std::thread scriptingThread([this] { ScriptingThreadBootstrap(); });
     _systemIO->RunMainLoop();
-    _scriptingThread.join();
+    scriptingThread.join();
 }
 
 AbyssEngine::Engine::~Engine() {

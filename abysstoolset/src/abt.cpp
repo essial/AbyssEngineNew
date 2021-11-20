@@ -20,10 +20,8 @@ void ExtractMPQ(std::string_view mpqFile, const std::filesystem::path &outputPat
 
         std::string destFile = line;
         std::replace(destFile.begin(), destFile.end(), '\\', '/');
-        std::filesystem::path sourcePath = line;
         auto filePath = (outputPath / destFile).make_preferred();
 
-        long x;
         try {
             std::ofstream writeFile(filePath.string(), std::ios::out | std::ios::binary);
             auto readFile = mpq.Load(line);

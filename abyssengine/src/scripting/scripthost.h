@@ -28,6 +28,7 @@ namespace AbyssEngine {
         // Script Functions -------------------
 
         void LuaFuncShutdown();
+        std::string LuaGetConfig(std::string_view category, std::string_view value);
     };
 
 }

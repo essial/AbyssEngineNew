@@ -1,13 +1,12 @@
 #include "sdl2systemio.h"
 #include "config.h"
 #include <SDL.h>
-#include <SDL_audio.h>
 #include <SDL_hints.h>
 #include <SDL_stdinc.h>
 #include <SDL_timer.h>
 #include <spdlog/spdlog.h>
 
-AbyssEngine::SystemIO::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemIO::ISystemIO() {
+AbyssEngine::SystemIO::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemIO::ISystemIO(), _runMainLoop(false) {
     SPDLOG_TRACE("Creating SDL2 System IO");
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER) != 0)
@@ -54,11 +53,6 @@ AbyssEngine::SystemIO::SDL2::SDL2SystemIO::~SDL2SystemIO() {
 }
 
 std::string_view AbyssEngine::SystemIO::SDL2::SDL2SystemIO::Name() { return "SDL2"; }
-
-void AbyssEngine::SystemIO::SDL2::SDL2SystemIO::HandleAudio(Uint8 *stream, int len) {
-    if (!_runMainLoop)
-        return;
-}
 
 void AbyssEngine::SystemIO::SDL2::SDL2SystemIO::PauseAudio(bool pause) {}
 

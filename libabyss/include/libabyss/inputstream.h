@@ -13,8 +13,7 @@ namespace LibAbyss {
                                                                            _streamBuff(std::move(streamBuff)) {};
 
     private:
-        std::unique_ptr<std::streambuf> _streamBuff;
-        std::unique_ptr<std::ifstream> _ifstream;
+        [[maybe_unused]] std::unique_ptr<std::streambuf> _streamBuff;
     };
 }
 

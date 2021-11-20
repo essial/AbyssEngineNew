@@ -20,13 +20,14 @@ namespace AbyssEngine {
         void Stop();
         void ScriptingThreadBootstrap();
         Loader &GetLoader() { return _loader; }
+        Common::INIFile &GetIniFile() { return _iniFile; }
 
     private:
         const std::filesystem::path _basePath;
         Common::INIFile _iniFile;
         Loader _loader;
         std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> _systemIO;
-        static std::mutex _mutex;
+        std::mutex _mutex;
 
 
     };
