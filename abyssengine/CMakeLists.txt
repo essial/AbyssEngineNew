@@ -118,7 +118,7 @@ target_link_libraries(${PROJECT_NAME}
         SDL2::SDL2
         SDL2::SDL2_ttf
         PNG::PNG
-        spdlog::spdlog spdlog::spdlog_header_only
+        spdlog::spdlog_header_only
         sol2::sol2
         ${FFMPEG_LIBRARIES}
         ${LUA_LIBRARIES}

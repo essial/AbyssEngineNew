@@ -40,7 +40,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         libabyss
-        spdlog::spdlog spdlog::spdlog_header_only
+        spdlog::spdlog_header_only
         argh
         )
 
