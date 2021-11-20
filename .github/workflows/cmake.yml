@@ -59,19 +59,19 @@ jobs:
                 if: matrix.os == 'macos-11'
                 run: brew install nasm ffmpeg
 
-#            -   name: Run vcpkg
-#                uses: lukka/run-vcpkg@v10
-#                with:
-#                    setupOnly: true
-#                    vcpkgJsonGlob: "**/vcpkg.json"
-#                    vcpkgDirectory: "${{ github.workspace }}/vcpkg"
-#                    vcpkgGitCommitId: "5568f110b509a9fd90711978a7cb76bae75bb092"
-#                    appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
-#                    additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
+            -   name: Run vcpkg
+                uses: lukka/run-vcpkg@v10
+                with:
+                    setupOnly: true
+                    vcpkgJsonGlob: "**/vcpkg.json"
+                    vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+                    vcpkgGitCommitId: "709e9ec32e27319636c047a38744e1ce0e229ae4"
+                    appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
+                    additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
 
             -   name: Build
                 uses: lukka/run-cmake@v3.4
                 with:
                     vcpkgDirectory: "${{ github.workspace }}/vcpkg"
-                    vcpkgGitCommitId: "44d94c2edbd44f0c01d66c2ad95eb6982a9a61bc"
+                    vcpkgGitCommitId: "709e9ec32e27319636c047a38744e1ce0e229ae4"
                     useVcpkgToolchainFile: true
