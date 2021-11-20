@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
+if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+    set(VCPKG_BUILD_TYPE release)
+endif()
+
 project(abysstoolset CXX)
 
 set(CMAKE_CXX_STANDARD 20)
