@@ -7,6 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(GNUInstallDirs)
 
+if(MSVC)
+    add_definitions(-D_HAS_DEPRECATED_RESULT_OF=1)
+endif(MSVC)
+
 find_package(ZLIB REQUIRED)
 find_package(BZip2 REQUIRED)
 find_package(stormlib CONFIG)
@@ -21,11 +25,6 @@ add_library(${PROJECT_NAME}
         src/mpq.cpp
         src/mpqstream.cpp
         )
-
-
-if (MSVC)
-    add_compile_definitions(/std:c++20)
-endif (MSVC)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
         FOLDER "Libraries/"

@@ -11,7 +11,7 @@ find_package(argh CONFIG REQUIRED)
 add_executable(${PROJECT_NAME})
 
 if (MSVC)
-    add_compile_definitions(/std:c++20)
+    add_definitions(-D_HAS_DEPRECATED_RESULT_OF=1)
 endif (MSVC)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
