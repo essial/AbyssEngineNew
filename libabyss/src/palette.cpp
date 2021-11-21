@@ -1,4 +1,5 @@
 #include "libabyss/palette.h"
+#include <string>
 
 namespace LibAbyss {
     const int NUM_PALETTE_COLORS = 256;
