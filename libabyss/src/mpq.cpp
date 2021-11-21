@@ -17,7 +17,7 @@ LibAbyss::MPQ::~MPQ() {
     SFileCloseArchive(_stormMpq);
 }
 
-LibAbyss::InputStream LibAbyss::MPQ::Load(const std::string& fileName) {
+LibAbyss::InputStream LibAbyss::MPQ::Load(std::string_view fileName) {
     return LibAbyss::InputStream(std::make_unique<LibAbyss::MPQStream>(_stormMpq, FixPath(fileName)));
 }
 
@@ -46,11 +46,11 @@ std::vector<std::string> LibAbyss::MPQ::FileList() {
     return result;
 }
 
-std::string LibAbyss::MPQ::FixPath(std::string str) {
+std::string LibAbyss::MPQ::FixPath(std::string_view str) {
     std::string result(str);
     std::replace(result.begin(), result.end(), '/', '\\');
     if (result.starts_with('\\')) {
-        result = result.substr(1);
+        return result.substr(1);
     }
 
     return result;

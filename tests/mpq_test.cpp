@@ -119,3 +119,10 @@ TEST_F(MpqTest, BigFile) {
     big >> x;
     EXPECT_TRUE(big.eof());
 }
+
+TEST_F(MpqTest, Slash) {
+    WriteMPQ([](HANDLE mpq){ WriteIn(mpq, "a\\b", "xyz"); });
+    LibAbyss::MPQ mpq(_fname);
+    mpq.Load("a/b");
+    mpq.Load("a\\b");
+}
