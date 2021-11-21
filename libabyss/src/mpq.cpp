@@ -3,11 +3,12 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 #include <string>
+#include <absl/strings/str_format.h>
 
 LibAbyss::MPQ::MPQ(const std::filesystem::path &mpqPath) : _mpqPath(std::filesystem::absolute(mpqPath).string()) {
     if (!SFileOpenArchive(_mpqPath.c_str(), 0, STREAM_PROVIDER_FLAT | BASE_PROVIDER_FILE | STREAM_FLAG_READ_ONLY,
                           &_stormMpq)) {
-        throw std::runtime_error("Error occurred while loading MPQ");
+        throw std::runtime_error(absl::StrFormat("Error occurred while opening MPQ %s", mpqPath.string()));
     }
 
     SPDLOG_INFO("Loaded {0}", _mpqPath);
@@ -24,7 +25,7 @@ LibAbyss::InputStream LibAbyss::MPQ::Load(std::string_view fileName) {
 }
 
 bool LibAbyss::MPQ::HasFile(std::string_view fileName) {
-    return SFileHasFile(_stormMpq, (const char *) fileName.data());
+    return SFileHasFile(_stormMpq, std::string(fileName).c_str());
 }
 
 std::vector<std::string> LibAbyss::MPQ::FileList() {

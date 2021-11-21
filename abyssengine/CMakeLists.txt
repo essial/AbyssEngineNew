@@ -117,7 +117,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         libabyss
-        absl::city absl::config absl::core_headers absl::endian absl::fixed_array absl::strings absl::optional absl::variant absl::utility absl::base absl::any absl::bits absl::int128 absl::hash absl::flat_hash_set
+        absl::flat_hash_map
         Threads::Threads
         SDL2::SDL2main
         SDL2::SDL2

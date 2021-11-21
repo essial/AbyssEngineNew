@@ -15,6 +15,10 @@ namespace LibAbyss {
 
         ~MPQStream() override;
 
+        std::streamsize StartOfBlockForTesting() const {
+            return _startOfBlock;
+        }
+
     protected:
         int underflow() override;
         pos_type seekpos(pos_type pos,

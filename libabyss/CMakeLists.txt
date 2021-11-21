@@ -7,6 +7,10 @@ endif()
 
 project(libabyss CXX)
 
+if(MSVC)
+    add_definitions(-D_HAS_DEPRECATED_RESULT_OF=1)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -21,6 +25,8 @@ if(NOT stormlib_FOUND)
     set_target_properties(stormlib::stormlib PROPERTIES
         IMPORTED_LOCATION ${STORMLIB})
 endif()
+find_package(absl CONFIG REQUIRED)
+find_package(fmt REQUIRED)
 
 add_library(${PROJECT_NAME}
         src/mpq.cpp
@@ -42,6 +48,8 @@ target_link_libraries(${PROJECT_NAME}
         BZip2::BZip2
         stormlib::stormlib
         ${CMAKE_THREAD_LIBS_INIT}
+        absl::str_format
+        fmt::fmt
         )
 
 install(TARGETS libabyss

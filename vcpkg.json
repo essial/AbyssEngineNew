@@ -12,6 +12,8 @@
         "stormlib",
         "sdl2-ttf",
         "sol2",
+        "gtest",
+        "fmt",
         {
             "name": "ffmpeg",
             "features": [

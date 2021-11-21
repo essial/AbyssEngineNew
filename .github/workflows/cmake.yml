@@ -75,3 +75,6 @@ jobs:
                     vcpkgDirectory: "${{ github.workspace }}/vcpkg"
                     vcpkgGitCommitId: "709e9ec32e27319636c047a38744e1ce0e229ae4"
                     useVcpkgToolchainFile: true
+
+            -   name: Test
+                run: "pwd && ls -l && ls -l ~ && ls -l ~/_temp && builddir/tests/abyss_tests"
