@@ -25,8 +25,8 @@ namespace AbyssEngine {
     private:
         const std::filesystem::path _basePath;
         Common::INIFile _iniFile;
-        Loader _loader;
         std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> _systemIO;
+        Loader _loader;
         std::mutex _mutex;
 
 

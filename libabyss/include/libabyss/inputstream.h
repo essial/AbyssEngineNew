@@ -1,7 +1,6 @@
 #ifndef ABYSS_INPUTSTREAM_H
 #define ABYSS_INPUTSTREAM_H
 
-#include <fstream>
 #include <istream>
 #include <streambuf>
 #include <memory>

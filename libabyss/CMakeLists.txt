@@ -12,10 +12,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(GNUInstallDirs)
 
-if(MSVC)
-    add_definitions(-D__STORMLIB_SELF__)
-endif(MSVC)
-
 find_package(ZLIB REQUIRED)
 find_package(BZip2 REQUIRED)
 find_package(stormlib CONFIG)

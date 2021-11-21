@@ -44,8 +44,7 @@ if (MSVC)
     set(OPTIONS WIN32)
     set(SOURCE_EXTRA resource.rc)
     set(APP_NAME "AbyssEngine")
-    add_definitions(-DCASCLIB_NO_AUTO_LINK_LIBRARY -D_CRT_SECURE_NO_WARNINGS -D_HAS_DEPRECATED_RESULT_OF=1 -D__STORMLIB_SELF__)
-
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_HAS_DEPRECATED_RESULT_OF=1)
 endif (MSVC)
 
 if (APPLE)

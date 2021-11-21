@@ -13,7 +13,7 @@ AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO::I
 
 void AbyssEngine::Engine::Run() {
     SPDLOG_TRACE("running engine");
-    _loader.AddProvider(std::move(std::make_unique<FileSystemProvider>(std::filesystem::current_path())));
+    _loader.AddProvider(std::make_unique<FileSystemProvider>(std::filesystem::current_path()));
     std::thread scriptingThread([this] { ScriptingThreadBootstrap(); });
     _systemIO->RunMainLoop();
     scriptingThread.join();

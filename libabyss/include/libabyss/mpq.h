@@ -1,6 +1,8 @@
 #ifndef ABYSS_MPQ_H
 #define ABYSS_MPQ_H
 
+#define STORMLIB_NO_AUTO_LINK 1
+
 #include <fstream>
 #include <vector>
 #include <string>

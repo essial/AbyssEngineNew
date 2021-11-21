@@ -16,10 +16,10 @@ namespace AbyssEngine {
 
 
     private:
-        Engine *_engine;
 
         sol::state _lua;
         sol::environment _environment;
+        Engine *_engine;
 
         std::tuple<sol::object, sol::object> LuaLoadString(const std::string_view str, const std::string &chunkName);
         std::tuple<sol::object, sol::object> LuaLoadFile(const std::string &pathStr);

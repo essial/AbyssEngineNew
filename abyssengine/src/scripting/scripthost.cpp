@@ -7,11 +7,10 @@ AbyssEngine::ScriptHost::ScriptHost(Engine *engine) : _lua(), _environment(_lua,
 
     _lua.open_libraries( );
     _lua.set_exception_handler([](lua_State *L, sol::optional<const std::exception &> maybe_exception,
-                                  sol::string_view description) {
+                                  std::string_view description) {
         //return LuaExceptionHandler(L, maybe_exception, description);
-        std::string str(description);
 
-        throw std::runtime_error(str.c_str());
+        throw std::runtime_error(std::string(description));
         return 0;
     });
 

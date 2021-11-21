@@ -18,8 +18,8 @@ namespace AbyssEngine {
         bool FileExists(std::filesystem::path &path);
         LibAbyss::InputStream Load(std::filesystem::path &path);
     private:
-        std::vector<std::unique_ptr<AbyssEngine::Provider>> _providers;
         std::mutex _mutex;
+        std::vector<std::unique_ptr<AbyssEngine::Provider>> _providers;
     };
 
 }
