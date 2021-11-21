@@ -9,7 +9,7 @@ namespace LibAbyss {
     class InputStream : public std::istream {
     public:
         explicit InputStream(std::unique_ptr<std::streambuf> streamBuff) : std::istream(streamBuff.get()),
-                                                                           _streamBuff(std::move(streamBuff)) {};
+                                                                           _streamBuff(std::move(streamBuff)) {}
 
     private:
         [[maybe_unused]] std::unique_ptr<std::streambuf> _streamBuff;
