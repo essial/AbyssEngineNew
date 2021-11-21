@@ -10,7 +10,13 @@ using testing::ThrowsMessage;
 class MpqTest : public testing::Test {
   public:
     MpqTest() {
+#ifdef _MSC_VER
+        char lpTempPathBuffer[MAX_PATH];
+        GetTempFileNameA(".", "mpq", 0, lpTempPathBuffer);
+        _fname = lpTempPathBuffer;
+#else
         _fname = std::tmpnam(nullptr);
+#endif
         _fname += ".mpq";
     }
 
@@ -19,15 +25,15 @@ class MpqTest : public testing::Test {
   protected:
     void WriteMPQ(std::function<void(HANDLE mpq)> data) {
         HANDLE mpq;
-        ASSERT_TRUE(SFileCreateArchive(_fname.c_str(), MPQ_CREATE_LISTFILE, 100, &mpq));
+        ASSERT_TRUE(SFileCreateArchive(_fname.c_str(), MPQ_CREATE_LISTFILE, 100, &mpq)) << GetLastError();
         data(mpq);
         SFileCloseArchive(mpq);
     }
     static void WriteIn(HANDLE mpq, const std::string &fname, std::string_view data) {
         HANDLE f;
-        ASSERT_TRUE(SFileCreateFile(mpq, fname.c_str(), 0, data.size(), 0, 0, &f));
-        ASSERT_TRUE(SFileWriteFile(f, data.data(), data.length(), 0));
-        ASSERT_TRUE(SFileFinishFile(f));
+        ASSERT_TRUE(SFileCreateFile(mpq, fname.c_str(), 0, data.size(), 0, 0, &f)) << GetLastError();
+        ASSERT_TRUE(SFileWriteFile(f, data.data(), data.length(), 0)) << GetLastError();
+        ASSERT_TRUE(SFileFinishFile(f)) << GetLastError();
     }
 
     std::string _fname;
