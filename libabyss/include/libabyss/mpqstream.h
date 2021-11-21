@@ -10,7 +10,7 @@ namespace LibAbyss {
 
     class MPQStream : public std::basic_streambuf<char> {
     public:
-        MPQStream(HANDLE mpq, std::string_view fileName);
+        MPQStream(HANDLE mpq, const std::string &fileName);
 
         ~MPQStream() override;
 

@@ -1,7 +1,7 @@
 #include "libabyss/mpqstream.h"
 
-LibAbyss::MPQStream::MPQStream(HANDLE mpq, std::string_view fileName) {
-    if (!SFileOpenFileEx(mpq, (const char *) fileName.data(), SFILE_OPEN_FROM_MPQ, &_mpqFile)) {
+LibAbyss::MPQStream::MPQStream(HANDLE mpq, const std::string& fileName) {
+    if (!SFileOpenFileEx(mpq, (const char *) fileName.c_str(), SFILE_OPEN_FROM_MPQ, &_mpqFile)) {
         throw std::runtime_error("Failed to open file from MPQ");
     }
 }

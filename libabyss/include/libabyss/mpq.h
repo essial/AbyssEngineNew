@@ -24,13 +24,15 @@ namespace LibAbyss {
 
         ~MPQ();
 
-        bool HasFile(std::string_view fileName);
-        InputStream Load(std::string_view fileName);
+        bool HasFile(const std::string &fileName);
+        InputStream Load(const std::string &fileName);
         std::vector<std::string> FileList();
 
     private:
         HANDLE _stormMpq;
         std::string _mpqPath;
+
+        std::string FixPath(std::string str);
     };
 
 } // namespace LibAbyss

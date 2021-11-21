@@ -8,22 +8,19 @@ LibAbyss::MPQ::MPQ(const std::filesystem::path &mpqPath) : _mpqPath(std::filesys
                           &_stormMpq)) {
         throw std::runtime_error("Error occurred while loading MPQ");
     }
-
-    SPDLOG_INFO("Loaded {0}", _mpqPath);
 }
 
 
 LibAbyss::MPQ::~MPQ() {
     SFileCloseArchive(_stormMpq);
-    SPDLOG_INFO("Unloaded {0}", _mpqPath);
 }
 
-LibAbyss::InputStream LibAbyss::MPQ::Load(std::string_view fileName) {
-    return LibAbyss::InputStream(std::make_unique<LibAbyss::MPQStream>(_stormMpq, fileName));
+LibAbyss::InputStream LibAbyss::MPQ::Load(const std::string& fileName) {
+    return LibAbyss::InputStream(std::make_unique<LibAbyss::MPQStream>(_stormMpq, FixPath(fileName)));
 }
 
-bool LibAbyss::MPQ::HasFile(std::string_view fileName) {
-    return SFileHasFile(_stormMpq, (const char *) fileName.data());
+bool LibAbyss::MPQ::HasFile(const std::string &fileName) {
+    return SFileHasFile(_stormMpq, FixPath(fileName).c_str());
 }
 
 std::vector<std::string> LibAbyss::MPQ::FileList() {
@@ -39,6 +36,16 @@ std::vector<std::string> LibAbyss::MPQ::FileList() {
         std::string line;
         stream >> line;
         result.push_back(line);
+    }
+
+    return result;
+}
+
+std::string LibAbyss::MPQ::FixPath(std::string str) {
+    std::string result(str);
+    std::replace(result.begin(), result.end(), '/', '\\');
+    if (result.starts_with('\\')) {
+        result = result.substr(1);
     }
 
     return result;
