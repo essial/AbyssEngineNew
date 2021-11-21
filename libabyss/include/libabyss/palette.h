@@ -63,7 +63,7 @@ namespace LibAbyss {
         std::vector<std::vector<uint8_t>> TextColorShifts = std::vector<std::vector<uint8_t>>();
     private:
         static std::vector<PaletteColor> DecodeColors(std::istream &stream, uint8_t colorBytes, int numColors);
-        static std::vector<std::vector<uint8_t>> LoadTransformMulti(std::istream &stream, uint variations);
+        static std::vector<std::vector<uint8_t>> LoadTransformMulti(std::istream &stream, int variations);
 
         static std::vector<uint8_t> LoadTransformSingle(std::istream &stream);
     };

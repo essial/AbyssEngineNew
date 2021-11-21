@@ -78,7 +78,7 @@ LibAbyss::Palette::DecodeColors(std::istream &stream, uint8_t colorBytes, int nu
     return result;
 }
 
-std::vector<std::vector<uint8_t>> LibAbyss::Palette::LoadTransformMulti(std::istream &stream, uint variations) {
+std::vector<std::vector<uint8_t>> LibAbyss::Palette::LoadTransformMulti(std::istream &stream, int variations) {
     std::vector<std::vector<uint8_t>> result;
     result.reserve(variations);
 
