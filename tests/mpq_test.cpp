@@ -47,6 +47,7 @@ TEST_F(MpqTest, NonExistingFile) {
     WriteMPQ([](HANDLE mpq) {});
     LibAbyss::MPQ mpq(_fname);
     EXPECT_THAT([&] { mpq.Load("non-existing.txt"); }, ThrowsMessage<std::runtime_error>(Eq("Failed to open file 'non-existing.txt' from MPQ")));
+    EXPECT_FALSE(mpq.HasFile("non-existing.txt"));
 }
 
 TEST_F(MpqTest, SmallFile) {
@@ -130,5 +131,9 @@ TEST_F(MpqTest, Slash) {
     WriteMPQ([](HANDLE mpq){ WriteIn(mpq, "a\\b", "xyz"); });
     LibAbyss::MPQ mpq(_fname);
     mpq.Load("a/b");
+    mpq.Load("/a/b");
     mpq.Load("a\\b");
+    EXPECT_TRUE(mpq.HasFile("a/b"));
+    EXPECT_TRUE(mpq.HasFile("/a/b"));
+    EXPECT_TRUE(mpq.HasFile("a\\b"));
 }
