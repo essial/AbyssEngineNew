@@ -48,24 +48,24 @@ TEST_F(MpqTest, SmallFile) {
 
     LibAbyss::MPQ mpq(_fname);
 
-    LibAbyss::InputStream small = mpq.Load("small.txt");
-    EXPECT_EQ(small.tellg(), 0);
-    EXPECT_EQ(small.get(), 'a');
-    EXPECT_EQ(small.tellg(), 1);
-    EXPECT_EQ(small.get(), 'b');
-    small.seekg(-1, std::ios_base::cur);
-    EXPECT_EQ(small.get(), 'b');
-    small.seekg(3);
-    EXPECT_EQ(small.get(), 'd');
-    EXPECT_FALSE(small.eof());
-    EXPECT_EQ(small.get(), -1);
-    EXPECT_TRUE(small.eof());
-    small.clear();
-    small.seekg(-2, std::ios_base::cur);
-    EXPECT_EQ(small.get(), 'c');
-    small.seekg(-2, std::ios_base::end);
-    EXPECT_EQ(small.get(), 'c');
-    EXPECT_EQ(small.tellg(), 3);
+    LibAbyss::InputStream stream = mpq.Load("small.txt");
+    EXPECT_EQ(stream.tellg(), 0);
+    EXPECT_EQ(stream.get(), 'a');
+    EXPECT_EQ(stream.tellg(), 1);
+    EXPECT_EQ(stream.get(), 'b');
+    stream.seekg(-1, std::ios_base::cur);
+    EXPECT_EQ(stream.get(), 'b');
+    stream.seekg(3);
+    EXPECT_EQ(stream.get(), 'd');
+    EXPECT_FALSE(stream.eof());
+    EXPECT_EQ(stream.get(), -1);
+    EXPECT_TRUE(stream.eof());
+    stream.clear();
+    stream.seekg(-2, std::ios_base::cur);
+    EXPECT_EQ(stream.get(), 'c');
+    stream.seekg(-2, std::ios_base::end);
+    EXPECT_EQ(stream.get(), 'c');
+    EXPECT_EQ(stream.tellg(), 3);
 }
 
 TEST_F(MpqTest, BigFile) {
@@ -83,41 +83,41 @@ TEST_F(MpqTest, BigFile) {
     WriteMPQ([&](HANDLE mpq) { WriteIn(mpq, "big.txt", source); });
 
     LibAbyss::MPQ mpq(_fname);
-    LibAbyss::InputStream big = mpq.Load("big.txt");
-    LibAbyss::MPQStream* strbuf = dynamic_cast<LibAbyss::MPQStream*>(big.rdbuf());
+    LibAbyss::InputStream stream = mpq.Load("big.txt");
+    LibAbyss::MPQStream* strbuf = dynamic_cast<LibAbyss::MPQStream*>(stream.rdbuf());
     ASSERT_NE(strbuf, nullptr);
-    big.seekg(40000);
+    stream.seekg(40000);
     EXPECT_EQ(strbuf->StartOfBlockForTesting(), 40000);
     int x;
-    big >> x;
-    big >> x;
-    big >> x;
+    stream >> x;
+    stream >> x;
+    stream >> x;
     EXPECT_EQ(x, 8224);
-    big.seekg(42040);
+    stream.seekg(42040);
     EXPECT_EQ(strbuf->StartOfBlockForTesting(), 40000);
-    big.seekg(-10, std::ios_base::cur);
+    stream.seekg(-10, std::ios_base::cur);
     EXPECT_EQ(strbuf->StartOfBlockForTesting(), 40000);
-    big >> x;
+    stream >> x;
     EXPECT_EQ(x, 8628);
-    big >> x;
-    big >> x;
-    big >> x;
+    stream >> x;
+    stream >> x;
+    stream >> x;
     EXPECT_EQ(x, 8631);
     EXPECT_EQ(strbuf->StartOfBlockForTesting(), 42048);
-    big.seekg(-10, std::ios_base::cur);
+    stream.seekg(-10, std::ios_base::cur);
     EXPECT_EQ(strbuf->StartOfBlockForTesting(), 42039);
-    big >> x;
+    stream >> x;
     EXPECT_EQ(x, 8630);
 
     // Finally, read the whole file
-    big.seekg(0);
+    stream.seekg(0);
     for (int i = 0; i < 10000; ++i) {
-        big >> x;
-        EXPECT_FALSE(big.eof());
+        stream >> x;
+        EXPECT_FALSE(stream.eof());
         EXPECT_EQ(i, x);
     }
-    big >> x;
-    EXPECT_TRUE(big.eof());
+    stream >> x;
+    EXPECT_TRUE(stream.eof());
 }
 
 TEST_F(MpqTest, Slash) {

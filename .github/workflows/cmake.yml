@@ -77,4 +77,4 @@ jobs:
                     useVcpkgToolchainFile: true
 
             -   name: Test
-                run: "pwd && ls -l && ls -l ../../ && ls -l ../../_temp && builddir/tests/abyss_tests"
+                run: "pwd && ls -l && ls -l ../../ && ls -l ../../_temp && ../../_temp/tests/abyss_tests"
