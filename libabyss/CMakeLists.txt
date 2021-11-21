@@ -18,15 +18,20 @@ include(GNUInstallDirs)
 
 find_package(ZLIB REQUIRED)
 find_package(BZip2 REQUIRED)
-find_package(stormlib CONFIG)
-if(NOT stormlib_FOUND)
-    find_library(STORMLIB storm REQUIRED)
+find_library(STORMLIB storm)
+if(STORMLIB)
     add_library(stormlib::stormlib UNKNOWN IMPORTED)
     set_target_properties(stormlib::stormlib PROPERTIES
         IMPORTED_LOCATION ${STORMLIB})
+else()
+    include(../cmake/CPM.cmake)
+    CPMAddPackage("https://github.com/ladislav-zezula/StormLib.git#5ab093b7a57b8779dff06a08fac19d46c40b3329")
+    add_library(stormlib::stormlib ALIAS storm)
+    target_include_directories(storm INTERFACE ${StormLib_SOURCE_DIR})
 endif()
 find_package(absl CONFIG REQUIRED)
 find_package(fmt REQUIRED)
+
 
 add_library(${PROJECT_NAME}
         src/mpq.cpp
@@ -44,7 +49,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         )
 
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE
+        PUBLIC
         ZLIB::ZLIB
         BZip2::BZip2
         stormlib::stormlib

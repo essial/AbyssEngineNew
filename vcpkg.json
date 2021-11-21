@@ -9,7 +9,6 @@
         "zlib",
         "sdl2",
         "lua",
-        "stormlib",
         "sdl2-ttf",
         "sol2",
         "gtest",

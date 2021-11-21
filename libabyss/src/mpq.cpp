@@ -22,7 +22,7 @@ LibAbyss::InputStream LibAbyss::MPQ::Load(std::string_view fileName) {
 }
 
 bool LibAbyss::MPQ::HasFile(std::string_view fileName) {
-    return SFileHasFile(_stormMpq, std::string(fileName).c_str());
+    return SFileHasFile(_stormMpq, FixPath(fileName).c_str());
 }
 
 std::vector<std::string> LibAbyss::MPQ::FileList() {
