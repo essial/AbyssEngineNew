@@ -5,7 +5,7 @@
 namespace LibAbyss {
 
 MPQStream::MPQStream(HANDLE mpq, std::string_view fileName) {
-    if (!SFileOpenFileEx(mpq, (const char *) fileName.data(), SFILE_OPEN_FROM_MPQ, &_mpqFile)) {
+    if (!SFileOpenFileEx(mpq, std::string(fileName).c_str(), SFILE_OPEN_FROM_MPQ, &_mpqFile)) {
         throw std::runtime_error(absl::StrFormat("Failed to open file '%s' from MPQ", fileName));
     }
 }

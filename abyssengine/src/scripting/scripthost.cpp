@@ -1,63 +1,41 @@
 #include "scripthost.h"
 #include "../engine/engine.h"
+#include "../engine/mpqprovider.h"
+#include "../engine/filesystemprovider.h"
 #include <filesystem>
 #include <spdlog/spdlog.h>
+#include <absl/strings/ascii.h>
 
-AbyssEngine::ScriptHost::ScriptHost(Engine *engine) : _lua(), _environment(_lua, sol::create), _engine(engine) {
+AbyssEngine::ScriptHost::ScriptHost(Engine *engine) : _lua(), _engine(engine) {
 
-    _lua.open_libraries( );
-    _lua.set_exception_handler([](lua_State *L, sol::optional<const std::exception &> maybe_exception,
-                                  std::string_view description) {
-        //return LuaExceptionHandler(L, maybe_exception, description);
+    _lua.open_libraries();
 
-        throw std::runtime_error(std::string(description));
-        return 0;
-    });
+    _environment = sol::environment(_lua, sol::create, _lua.globals());
 
-    _environment["_G"] = _environment;
+    _lua.set_exception_handler(
+            [](lua_State *L, sol::optional<const std::exception &> maybe_exception, sol::string_view description) {
+                // return LuaExceptionHandler(L, maybe_exception, description);
 
-    auto whitelisted = {
-            "assert", "error", "ipairs", "next", "pairs", "pcall", "print", "select", "tonumber", "tostring", "type",
-            "unpack", "_VERSION", "xpcall",
-            // These functions are unsafe as they can bypass or change metatables, but they are required to implement classes.
-            "rawequal", "rawget", "rawset", "setmetatable"
-    };
+                throw std::runtime_error(std::string(description));
+                return 0;
+            });
 
-    for (const auto &name: whitelisted) {
-        _environment[name] = _lua[name];
-    }
-
-    std::vector<std::string> safeLibraries = {
-            "coroutine", "string", "table", "math"};
-
-    for (const auto &name : safeLibraries) {
-        sol::table copy(_lua, sol::create);
-
-        for (const auto& pair : _lua[name].tbl) {
-            copy[pair.first] = pair.second;
-        }
-        _environment[name] = copy;
-    }
-
-    sol::table os(_lua, sol::create);
-    os["clock"] = _lua["os"]["clock"];
-    os["date"] = _lua["os"]["date"];
-    os["difftime"] = _lua["os"]["difftime"];
-    os["time"] = _lua["os"]["time"];
-    _environment["os"] = os;
-
-    lua_rawgeti(_lua, LUA_REGISTRYINDEX, _environment.registry_index());
-    lua_rawseti(_lua, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
-
+    // Overload loading functions
     _environment.set_function("loadstring", &ScriptHost::LuaLoadString, this);
     _environment.set_function("loadfile", &ScriptHost::LuaLoadFile, this);
     _environment.set_function("dofile", &ScriptHost::LuaDoFile, this);
     _environment.set_function("require", &ScriptHost::LuaLoadFile, this);
 
+    // Engine Functions
     _environment.set_function("shutdown", &ScriptHost::LuaFuncShutdown, this);
     _environment.set_function("getConfig", &ScriptHost::LuaGetConfig, this);
+    _environment.set_function("showSystemCursor", &ScriptHost::LuaShowSystemCursor, this);
+    _environment.set_function("log", &ScriptHost::LuaLog, this);
+    _environment.set_function("setBootText", &ScriptHost::LuaSetBootText, this);
+    _environment.set_function("addLoaderProvider", &ScriptHost::LuaAddLoaderProvider, this);
+    _environment.set_function("loadPalette", &ScriptHost::LuaLoadPalette, this);
+    _environment.set_function("fileExists", &ScriptHost::LuaFileExists, this);
 }
-
 
 std::tuple<sol::object, sol::object>
 AbyssEngine::ScriptHost::LuaLoadString(const std::string_view str, const std::string &chunkName) {
@@ -92,7 +70,6 @@ std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadFile(const 
 
     std::istreambuf_iterator<char> eos;
     std::string str(std::istreambuf_iterator<char>(stream), eos);
-
 
     auto ret = LuaLoadString(str, "@" + path.string());
 
@@ -130,4 +107,76 @@ void AbyssEngine::ScriptHost::LuaFuncShutdown() {
 
 std::string AbyssEngine::ScriptHost::LuaGetConfig(std::string_view category, std::string_view value) {
     return _engine->GetIniFile().GetValue(category, value);
+}
+
+void AbyssEngine::ScriptHost::LuaShowSystemCursor(bool show) { _engine->ShowSystemCursor(show); }
+
+void AbyssEngine::ScriptHost::LuaLog(const std::string &level, const std::string &message) {
+    if (level == "info") {
+        SPDLOG_INFO(message);
+        return;
+    }
+
+    if (level == "error") {
+        SPDLOG_ERROR(message);
+        return;
+    }
+
+    if (level == "fatal") {
+        SPDLOG_CRITICAL(message);
+        return;
+    }
+
+    if (level == "warn") {
+        SPDLOG_WARN(message);
+        return;
+    }
+
+    if (level == "debug") {
+        SPDLOG_DEBUG(message);
+        return;
+    }
+
+    if (level == "trace") {
+        SPDLOG_TRACE(message);
+        return;
+    }
+
+    throw std::runtime_error("Unknown log level specified: " + level);
+}
+
+void AbyssEngine::ScriptHost::LuaSetBootText(const std::string &text) { _engine->SetBootText(text); }
+
+void AbyssEngine::ScriptHost::LuaAddLoaderProvider(const std::string &providerType, const std::string &providerPath) {
+    if (providerType == "mpq") {
+        auto path = std::filesystem::path(providerPath);
+        auto provider = std::make_unique<AbyssEngine::MPQProvider>(path);
+        _engine->GetLoader().AddProvider(std::move(provider));
+
+        return;
+    }
+
+    if (providerType == "filesystem") {
+        auto path = std::filesystem::path(providerPath);
+        auto provider = std::make_unique<AbyssEngine::FileSystemProvider>(path);
+        _engine->GetLoader().AddProvider(std::move(provider));
+
+        return;
+    }
+
+    throw std::runtime_error("Unknown provider type: " + providerType);
+}
+
+void AbyssEngine::ScriptHost::LuaLoadPalette(const std::string &paletteName, const std::string &path) {
+    bool isDat = !absl::AsciiStrToLower(path).ends_with(".pl2");
+    std::filesystem::path filePath(path);
+    auto stream = _engine->GetLoader().Load(filePath);
+    auto palette = std::make_unique<LibAbyss::Palette>(stream, isDat);
+
+    _engine->AddPalette(std::move(palette));
+}
+
+bool AbyssEngine::ScriptHost::LuaFileExists(const std::string &fileName) {
+    auto path = std::filesystem::path(fileName);
+    return _engine->GetLoader().FileExists(path);
 }

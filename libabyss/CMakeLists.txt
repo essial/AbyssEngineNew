@@ -31,6 +31,7 @@ find_package(fmt REQUIRED)
 add_library(${PROJECT_NAME}
         src/mpq.cpp
         src/mpqstream.cpp
+        src/palette.cpp
         )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
