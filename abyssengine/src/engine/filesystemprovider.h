@@ -12,9 +12,9 @@ namespace AbyssEngine {
         ~FileSystemProvider() override = default;
 
     protected:
-        bool Exists(std::filesystem::path &path) override;
+        bool Exists(const std::filesystem::path &path) override;
 
-        LibAbyss::InputStream Load(std::filesystem::path &path) override;
+        LibAbyss::InputStream Load(const std::filesystem::path &path) override;
     private:
         std::filesystem::path _basePath;
     };
