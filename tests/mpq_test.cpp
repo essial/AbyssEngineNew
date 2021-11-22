@@ -10,13 +10,7 @@ using testing::ThrowsMessage;
 class MpqTest : public testing::Test {
   public:
     MpqTest() {
-#ifdef _MSC_VER
-        char lpTempPathBuffer[MAX_PATH];
-        GetTempFileNameA(".", "mpq", 0, lpTempPathBuffer);
-        _fname = lpTempPathBuffer;
-#else
         _fname = std::tmpnam(nullptr);
-#endif
         _fname += ".mpq";
     }
 
