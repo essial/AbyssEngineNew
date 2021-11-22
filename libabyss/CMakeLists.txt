@@ -23,6 +23,7 @@ if(STORMLIB)
     add_library(stormlib::stormlib UNKNOWN IMPORTED)
     set_target_properties(stormlib::stormlib PROPERTIES
         IMPORTED_LOCATION ${STORMLIB})
+    message(STATUS "Using StormLib from ${STORMLIB}")
 else()
     include(../cmake/CPM.cmake)
     CPMAddPackage("https://github.com/ladislav-zezula/StormLib.git#5ab093b7a57b8779dff06a08fac19d46c40b3329")
