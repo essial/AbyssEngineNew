@@ -6,7 +6,8 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 if(MSVC)
-    add_definitions(-D__STORMLIB_SELF__)
+    # TODO: remove this when depending on CASC
+    add_definitions(-DCASCLIB_NO_AUTO_LINK_LIBRARY)
 endif(MSVC)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")

@@ -70,8 +70,10 @@ jobs:
                     additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
 
             -   name: Build
-                uses: lukka/run-cmake@v3.4
+                uses: lukka/run-cmake@v10
                 with:
-                    vcpkgDirectory: "${{ github.workspace }}/vcpkg"
-                    vcpkgGitCommitId: "709e9ec32e27319636c047a38744e1ce0e229ae4"
-                    useVcpkgToolchainFile: true
+                    configurePreset: 'ninja-multi-vcpkg'
+                    buildPreset: 'ninja-multi-vcpkg'
+
+            -   name: Test
+                run: builds/ninja-multi-vcpkg/tests/Debug/abyss_test
