@@ -1,7 +1,7 @@
 #include "libabyss/palette.h"
 #include <string>
 
-namespace LibAbyss {
+namespace {
     const int NUM_PALETTE_COLORS = 256;
     const int NUM_TEXT_COLORS = 13;
     const int LIGHT_LEVEL_VARIATIONS = 32;

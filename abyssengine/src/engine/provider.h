@@ -9,8 +9,8 @@ namespace AbyssEngine {
     class Provider {
     public:
         virtual ~Provider() = default;
-        virtual bool Exists(std::filesystem::path &path) = 0;
-        virtual LibAbyss::InputStream Load(std::filesystem::path &path) = 0;
+        virtual bool Exists(const std::filesystem::path &path) = 0;
+        virtual LibAbyss::InputStream Load(const std::filesystem::path &path) = 0;
     };
 
 }

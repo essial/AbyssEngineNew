@@ -15,8 +15,8 @@ namespace AbyssEngine {
     public:
         Loader();
         void AddProvider(std::unique_ptr<AbyssEngine::Provider> provider);
-        bool FileExists(std::filesystem::path &path);
-        LibAbyss::InputStream Load(std::filesystem::path &path);
+        bool FileExists(const std::filesystem::path &path);
+        LibAbyss::InputStream Load(const std::filesystem::path &path);
     private:
         std::mutex _mutex;
         std::vector<std::unique_ptr<AbyssEngine::Provider>> _providers;

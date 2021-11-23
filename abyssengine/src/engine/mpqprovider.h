@@ -8,12 +8,12 @@ namespace AbyssEngine {
 
     class MPQProvider : public Provider {
     public:
-        MPQProvider(std::filesystem::path &path);
+        MPQProvider(const std::filesystem::path &path);
 
     protected:
-        bool Exists(std::filesystem::path &path) override;
+        bool Exists(const std::filesystem::path &path) override;
 
-        LibAbyss::InputStream Load(std::filesystem::path &path) override;
+        LibAbyss::InputStream Load(const std::filesystem::path &path) override;
 
     private:
         LibAbyss::MPQ _mpq;
