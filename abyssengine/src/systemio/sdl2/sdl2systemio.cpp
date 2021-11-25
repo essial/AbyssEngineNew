@@ -5,9 +5,10 @@
 #include <SDL_stdinc.h>
 #include <spdlog/spdlog.h>
 #include "../../hostnotify/hostnotify.h"
-#ifdef _WIN32
 #include <SDL_syswm.h>
-#endif // _WIN32
+#ifdef __APPLE__
+#include "../../hostnotify/hostnotify_mac_shim.h"
+#endif // __APPLE__
 
 AbyssEngine::SystemIO::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemIO::ISystemIO(), _runMainLoop(false) {
     SPDLOG_TRACE("Creating SDL2 System IO");
@@ -27,6 +28,10 @@ AbyssEngine::SystemIO::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemI
     SDL_GetWindowWMInfo(_sdlWindow, &wmInfo);
     AbyssEngine::HostNotify::Win32Handle = wmInfo.info.win.window;
 #endif // _WIN32
+#ifdef __APPLE__
+    AbyssHostNotifyInitMac();
+
+#endif // __APPLE__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
     SDL_SetHint(SDL_HINT_AUDIO_DEVICE_APP_NAME, "Abyss Engine");
@@ -52,6 +57,10 @@ AbyssEngine::SystemIO::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemI
 
 AbyssEngine::SystemIO::SDL2::SDL2SystemIO::~SDL2SystemIO() {
     SPDLOG_TRACE("Destroying SDL2 System IO");
+
+#ifdef __APPLE__
+    AbyssHostNotifyFinalizeMac();
+#endif // __APPLE__
 
     if (_sdlRenderer != nullptr)
         SDL_DestroyRenderer(_sdlRenderer);

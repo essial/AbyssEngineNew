@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
     set(VCPKG_BUILD_TYPE release)
-endif()
+endif ()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -58,9 +58,9 @@ endif (APPLE)
 
 add_executable(${PROJECT_NAME} ${OPTIONS})
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-add_definitions(-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE -DSPDLOG_DEBUG_ON -DSPDLOG_TRACE_ON)
-endif(CMAKE_BUILD_TYPE MATCHES Debug)
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE -DSPDLOG_DEBUG_ON -DSPDLOG_TRACE_ON)
+endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
         FOLDER "Applications/"
@@ -87,10 +87,17 @@ file(GLOB_RECURSE CASC_SOURCES "${CascLib_SOURCE_DIR}/src/*.cpp")
 
 
 if (MSVC)
-  set(SOURCE_EXTRA ${SOURCE_EXTRA} src/hostnotify/hostnotify_windows.cpp)
-else()
-  set(SOURCE_EXTRA ${SOURCE_EXTRA} src/hostnotify/hostnotify_stub.cpp)
-endif()
+    list(APPEND SOURCE_EXTRA
+            src/hostnotify/hostnotify_windows.cpp
+            )
+elseif (APPLE)
+    find_library(APPKIT_LIBRARY AppKit)
+    list(APPEND SOURCE_EXTRA
+            src/hostnotify/hostnotify_mac.cpp
+            src/hostnotify/hostnotify_mac_shim.m
+            )
+else ()
+endif ()
 
 target_sources(${PROJECT_NAME} PRIVATE
         # Engine Core --------------------------------------------------
