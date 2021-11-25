@@ -95,6 +95,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/systemio/sdl2/sdl2systemio.cpp
         src/common/inifile.cpp
         src/scripting/scripthost.cpp
+        src/node/node.cpp
 
         # Dynamic ------------------------------------------------------
         ${SOURCE_EXTRA}
