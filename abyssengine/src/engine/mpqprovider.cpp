@@ -6,7 +6,7 @@ AbyssEngine::MPQProvider::MPQProvider(const std::filesystem::path &path) : _mpq(
 }
 
 bool AbyssEngine::MPQProvider::Exists(const std::filesystem::path &path) {
-    return _mpq.HasFile(absolute(path).string());
+    return _mpq.HasFile(path.string());
 }
 
 LibAbyss::InputStream AbyssEngine::MPQProvider::Load(const std::filesystem::path &path) {

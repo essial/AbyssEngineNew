@@ -11,3 +11,5 @@ CMakeSettings.json
 vcpkg_installed/
 *.DotSettings.user
 .cache
+builds/
+*.bak

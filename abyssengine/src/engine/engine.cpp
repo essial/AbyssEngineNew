@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "filesystemprovider.h"
+#include "../hostnotify/hostnotify.h"
 #include <spdlog/spdlog.h>
 
 AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO::ISystemIO> systemIo)
@@ -28,6 +29,7 @@ void AbyssEngine::Engine::ScriptingThreadBootstrap() {
         scriptHost.ExecuteString("dofile \"bootstrap\"");
     } catch (std::exception &ex) {
         SPDLOG_ERROR("Lua Error:\n{0}", ex.what());
+        AbyssEngine::HostNotify::Notify(AbyssEngine::eNotifyType::Fatal, "Script Error", ex.what());
         Stop();
     }
 

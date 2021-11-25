@@ -1,6 +1,6 @@
-#include <string>
 #include <filesystem>
 #include "engine/engine.h"
+#include "hostnotify/hostnotify.h"
 #include <config.h>
 #include <memory>
 #include "systemio/sdl2/sdl2systemio.h"
@@ -50,6 +50,7 @@ int main(int, char *argv[]) {
 
     } catch (std::exception &ex) {
         SPDLOG_CRITICAL(ex.what());
+        AbyssEngine::HostNotify::Notify(AbyssEngine::eNotifyType::Fatal, "AbyssEngine Crash", ex.what());
         return EXIT_FAILURE;
     }
 

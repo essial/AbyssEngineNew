@@ -3,8 +3,11 @@
 #include <SDL.h>
 #include <SDL_hints.h>
 #include <SDL_stdinc.h>
-#include <SDL_timer.h>
 #include <spdlog/spdlog.h>
+#include "../../hostnotify/hostnotify.h"
+#ifdef _WIN32
+#include <SDL_syswm.h>
+#endif // _WIN32
 
 AbyssEngine::SystemIO::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemIO::ISystemIO(), _runMainLoop(false) {
     SPDLOG_TRACE("Creating SDL2 System IO");
@@ -17,6 +20,13 @@ AbyssEngine::SystemIO::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemI
 
     if (_sdlWindow == nullptr)
         throw std::runtime_error(SDL_GetError());
+
+#ifdef _WIN32
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    SDL_GetWindowWMInfo(_sdlWindow, &wmInfo);
+    AbyssEngine::HostNotify::Win32Handle = wmInfo.info.win.window;
+#endif // _WIN32
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
     SDL_SetHint(SDL_HINT_AUDIO_DEVICE_APP_NAME, "Abyss Engine");

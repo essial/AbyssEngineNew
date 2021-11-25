@@ -85,6 +85,13 @@ target_compile_options(${PROJECT_NAME} PRIVATE ${FFMPEG_DEFINITIONS})
 
 file(GLOB_RECURSE CASC_SOURCES "${CascLib_SOURCE_DIR}/src/*.cpp")
 
+
+if (MSVC)
+  set(SOURCE_EXTRA ${SOURCE_EXTRA} src/hostnotify/hostnotify_windows.cpp)
+else()
+  set(SOURCE_EXTRA ${SOURCE_EXTRA} src/hostnotify/hostnotify_stub.cpp)
+endif()
+
 target_sources(${PROJECT_NAME} PRIVATE
         # Engine Core --------------------------------------------------
         src/abyssengine.cpp
@@ -102,7 +109,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 
         # Others -------------------------------------------------------
         ${SOURCE_APP}
-        ${SOURCE_EXTRA}
         ${CASC_SOURCES}
         ${CascLib_SOURCE_DIR}/src/jenkins/lookup3.c
         )
