@@ -97,6 +97,7 @@ elseif (APPLE)
             src/hostnotify/hostnotify_mac_shim.m
             )
 else ()
+    list(APPEND SOURCE_EXTRA src/hostnotify/hostnotify_stub.cpp)
 endif ()
 
 target_sources(${PROJECT_NAME} PRIVATE
