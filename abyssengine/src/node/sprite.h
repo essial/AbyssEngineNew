@@ -3,6 +3,7 @@
 
 #include "../common/rectangle.h"
 #include "node.h"
+#include "../systemio/interface.h"
 
 namespace AbyssEngine {
 
@@ -16,9 +17,9 @@ class Sprite : public Node {
     };
 
     Sprite();
-    void UpdateCallback(Engine &engine, uint32_t ticks) final;
-    void RenderCallback(Engine &engine, int offsetX, int offsetY) final;
-    void MouseEventCallback(Engine &engine, MouseEventInfo eventInfo) final;
+    void UpdateCallback(uint32_t ticks) final;
+    void RenderCallback(int offsetX, int offsetY) final;
+    void MouseEventCallback(MouseEventInfo eventInfo) final;
 
     virtual void GetFrameOffset(uint32_t frame, int &offsetX, int &offsetY) = 0;
     virtual void GetFrameSize(uint32_t frame, uint32_t &width, uint32_t &height) = 0;

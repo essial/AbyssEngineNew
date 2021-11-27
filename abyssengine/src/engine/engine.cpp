@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "../hostnotify/hostnotify.h"
 #include "filesystemprovider.h"
+#include "../scripting/scripthost.h"
 #include <spdlog/spdlog.h>
 
 AbyssEngine::Engine *_engineGlobalInstance = nullptr;
@@ -15,14 +16,14 @@ AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO::I
 void AbyssEngine::Engine::Run() {
     SPDLOG_TRACE("running engine");
     _loader.AddProvider(std::make_unique<FileSystemProvider>(std::filesystem::current_path()));
-    std::thread scriptingThread([this] { ScriptingThreadBootstrap(); });
+    std::thread scriptingThread([this] { ScriptingThread(); });
     _systemIO->RunMainLoop();
     scriptingThread.join();
 }
 
 AbyssEngine::Engine::~Engine() { SPDLOG_TRACE("destroying engine"); }
 
-void AbyssEngine::Engine::ScriptingThreadBootstrap() {
+void AbyssEngine::Engine::ScriptingThread() {
     SPDLOG_TRACE("Scripting thread started");
 
     ScriptHost scriptHost(this);
@@ -56,7 +57,7 @@ void AbyssEngine::Engine::SetBootText(std::string_view text) {
 }
 
 void AbyssEngine::Engine::AddPalette(std::string_view paletteName, const LibAbyss::Palette &palette) {
-    _palettes[std::string(paletteName)] = palette;
+    _palettes.emplace(paletteName, palette);
 }
 
 AbyssEngine::Engine *AbyssEngine::Engine::Get() { return _engineGlobalInstance; }

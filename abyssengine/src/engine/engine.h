@@ -2,7 +2,6 @@
 #define ABYSS_ENGINE_H
 
 #include "../common/inifile.h"
-#include "../scripting/scripthost.h"
 #include "../systemio/interface.h"
 #include "libabyss/palette.h"
 #include "loader.h"
@@ -20,7 +19,7 @@ class Engine {
 
     void Run();
     void Stop();
-    void ScriptingThreadBootstrap();
+    void ScriptingThread();
     void ShowSystemCursor(bool show);
     void SetBootText(std::string_view text);
     void AddPalette(std::string_view paletteName, const LibAbyss::Palette &palette);

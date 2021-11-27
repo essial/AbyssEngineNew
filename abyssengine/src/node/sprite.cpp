@@ -2,16 +2,16 @@
 
 AbyssEngine::Sprite::Sprite() : _atlas(), _framePositions() {}
 
-void AbyssEngine::Sprite::UpdateCallback(AbyssEngine::Engine &engine, uint32_t ticks) {
+void AbyssEngine::Sprite::UpdateCallback(uint32_t ticks) {
     if (!Active)
         return;
 
     Animate((float)ticks / 1000.f);
 
-    Node::UpdateCallback(engine, ticks);
+    Node::UpdateCallback(ticks);
 }
 
-void AbyssEngine::Sprite::RenderCallback(AbyssEngine::Engine &engine, int offsetX, int offsetY) {
+void AbyssEngine::Sprite::RenderCallback(int offsetX, int offsetY) {
     if (!Visible || !Active)
         return;
 
@@ -60,11 +60,11 @@ void AbyssEngine::Sprite::RenderCallback(AbyssEngine::Engine &engine, int offset
         posY += lastHeight;
     }
 
-    Node::RenderCallback(engine, offsetX, offsetY);
+    Node::RenderCallback(offsetX, offsetY);
 }
 
-void AbyssEngine::Sprite::MouseEventCallback(AbyssEngine::Engine &engine, AbyssEngine::MouseEventInfo eventInfo) {
-    Node::MouseEventCallback(engine, eventInfo);
+void AbyssEngine::Sprite::MouseEventCallback(AbyssEngine::MouseEventInfo eventInfo) {
+    Node::MouseEventCallback(eventInfo);
 }
 
 void AbyssEngine::Sprite::Animate(float elapsed) {

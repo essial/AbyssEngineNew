@@ -2,7 +2,6 @@
 #define ABYSS_NODE_H
 
 #include "../common/events.h"
-#include "../engine/engine.h"
 #include <vector>
 
 namespace AbyssEngine {
@@ -11,9 +10,9 @@ class Node {
   public:
     virtual ~Node() = default;
 
-    virtual void UpdateCallback(Engine &engine, uint32_t ticks);
-    virtual void RenderCallback(Engine &engine, int offsetX, int offsetY);
-    virtual void MouseEventCallback(Engine &engine, MouseEventInfo eventInfo){};
+    virtual void UpdateCallback(uint32_t ticks);
+    virtual void RenderCallback(int offsetX, int offsetY);
+    virtual void MouseEventCallback(MouseEventInfo eventInfo){};
     void GetEffectiveLayout(int &x, int &y);
     void AppendChild(std::unique_ptr<Node> childNode);
     void RemoveChild(Node *nodeRef);

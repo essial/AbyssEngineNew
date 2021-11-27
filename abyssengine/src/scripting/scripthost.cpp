@@ -1,9 +1,8 @@
 #include "scripthost.h"
-#include "../engine/engine.h"
 #include "../engine/filesystemprovider.h"
 #include "../engine/mpqprovider.h"
 #include "../engine/spritefont.h"
-#include "../node/dc6sprite.h"
+#include "../engine/engine.h"
 #include <absl/strings/ascii.h>
 #include <filesystem>
 #include <spdlog/spdlog.h>

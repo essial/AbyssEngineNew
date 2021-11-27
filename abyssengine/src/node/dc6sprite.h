@@ -3,6 +3,7 @@
 
 #include "libabyss/dc6.h"
 #include "sprite.h"
+#include "libabyss/palette.h"
 
 namespace AbyssEngine {
 
