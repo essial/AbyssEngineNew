@@ -22,7 +22,7 @@ class Node {
     bool Visible = true;
     bool Active = true;
 
-    Node *Parent;
+    Node *Parent = nullptr;
     std::vector<std::unique_ptr<Node>> Children = std::vector<std::unique_ptr<Node>>();
 };
 

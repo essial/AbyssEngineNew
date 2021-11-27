@@ -17,7 +17,7 @@ class DC6Sprite : public Sprite {
     uint32_t GetFramesPerAnimation() final;
 
   protected:
-    void RegenerateAtlas() override;
+    void RegenerateAtlas() final;
 
   private:
     LibAbyss::DC6 _dc6;

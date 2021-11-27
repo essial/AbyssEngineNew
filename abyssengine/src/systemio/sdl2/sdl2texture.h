@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include "../interface.h"
 
-namespace AbyssEngine::SystemIO::SDL2 {
+namespace AbyssEngine::SDL2 {
 
 class SDL2Texture : public ITexture {
   public:

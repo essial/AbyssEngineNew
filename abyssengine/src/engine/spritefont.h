@@ -28,7 +28,7 @@ class SpriteFont {
   private:
     void RegenerateAtlas();
     std::unique_ptr<LibAbyss::DC6> _dc6;
-    std::unique_ptr<SystemIO::ITexture> _atlas;
+    std::unique_ptr<ITexture> _atlas;
     std::vector<Glyph> _glyphs;
     std::vector<FramePosition> _frameRects;
     const LibAbyss::Palette &_palette;

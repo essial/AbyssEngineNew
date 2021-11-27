@@ -43,7 +43,7 @@ int main(int, char *argv[]) {
         AbyssEngine::Common::INIFile iniFile(configPath / "config.ini");
         iniFile.SetValue("#Abyss", "BasePath", std::filesystem::absolute(configPath).string());
 
-        std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> systemIo = std::make_unique<AbyssEngine::SystemIO::SDL2::SDL2SystemIO>();
+        std::unique_ptr<AbyssEngine::SystemIO> systemIo = std::make_unique<AbyssEngine::SDL2::SDL2SystemIO>();
 
         AbyssEngine::Engine engine(std::move(iniFile), std::move(systemIo));
         engine.Run();

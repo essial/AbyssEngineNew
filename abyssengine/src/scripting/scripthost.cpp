@@ -33,10 +33,10 @@ AbyssEngine::ScriptHost::ScriptHost(Engine *engine) : _lua(), _engine(engine) {
     _environment.set_function("getConfig", &ScriptHost::LuaGetConfig, this);
     _environment.set_function("showSystemCursor", &ScriptHost::LuaShowSystemCursor, this);
     _environment.set_function("log", &ScriptHost::LuaLog, this);
-    _environment.set_function("setBootText", &ScriptHost::LuaSetBootText, this);
     _environment.set_function("addLoaderProvider", &ScriptHost::LuaAddLoaderProvider, this);
     _environment.set_function("loadPalette", &ScriptHost::LuaLoadPalette, this);
     _environment.set_function("fileExists", &ScriptHost::LuaFileExists, this);
+    _environment.set_function("setCursor", &ScriptHost::LuaSetCursor, this);
 
     auto spriteObject = _environment.set_function("loadSprite", &ScriptHost::LuaLoadSprite, this);
 
@@ -117,7 +117,7 @@ std::string AbyssEngine::ScriptHost::LuaGetConfig(std::string_view category, std
     return _engine->GetIniFile().GetValue(category, value);
 }
 
-void AbyssEngine::ScriptHost::LuaShowSystemCursor(bool show) { _engine->ShowSystemCursor(show); }
+void AbyssEngine::ScriptHost::LuaShowSystemCursor(bool show) { _engine->GetSystemIO().ShowSystemCursor(show); }
 
 void AbyssEngine::ScriptHost::LuaLog(std::string_view level, std::string_view message) {
     if (level == "info") {
@@ -153,8 +153,6 @@ void AbyssEngine::ScriptHost::LuaLog(std::string_view level, std::string_view me
     throw std::runtime_error("Unknown log level specified: " + std::string(level));
 }
 
-void AbyssEngine::ScriptHost::LuaSetBootText(std::string_view text) { _engine->SetBootText(text); }
-
 void AbyssEngine::ScriptHost::LuaAddLoaderProvider(std::string_view providerType, std::string_view providerPath) {
     if (providerType == "mpq") {
         auto path = std::filesystem::path(providerPath);
@@ -187,7 +185,7 @@ bool AbyssEngine::ScriptHost::LuaFileExists(std::string_view fileName) {
     auto path = std::filesystem::path(fileName);
     return _engine->GetLoader().FileExists(path);
 }
-std::unique_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
+AbyssEngine::Sprite* AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
     const auto &engine = AbyssEngine::Engine::Get();
     const std::filesystem::path path(spritePath);
 
@@ -198,7 +196,10 @@ std::unique_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std:
     const auto &palette = engine->GetPalette(paletteName);
 
     if (absl::AsciiStrToLower(spritePath).ends_with(".dc6")) {
-        return std::make_unique<DC6Sprite>(stream, palette);
+        return new DC6Sprite(stream, palette);
     } else
         throw std::runtime_error(absl::StrCat("Unknowns sprite format for file: ", spritePath));
+}
+void AbyssEngine::ScriptHost::LuaSetCursor(Sprite& sprite, int offsetX, int offsetY) {
+    _engine->GetSystemIO().SetCursorSprite(&sprite, offsetX, offsetY);
 }

@@ -2,6 +2,7 @@
 #define ABYSS_ENGINE_H
 
 #include "../common/inifile.h"
+#include "../node/sprite.h"
 #include "../systemio/interface.h"
 #include "libabyss/palette.h"
 #include "loader.h"
@@ -14,18 +15,17 @@ namespace AbyssEngine {
 
 class Engine {
   public:
-    Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO::ISystemIO> systemIo);
+    Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO> systemIo);
     ~Engine();
 
     void Run();
     void Stop();
     void ScriptingThread();
-    void ShowSystemCursor(bool show);
-    void SetBootText(std::string_view text);
     void AddPalette(std::string_view paletteName, const LibAbyss::Palette &palette);
+
     Loader &GetLoader() { return _loader; }
     Common::INIFile &GetIniFile() { return _iniFile; }
-    SystemIO::ISystemIO &GetSystemIO() { return *_systemIO; }
+    SystemIO &GetSystemIO() { return *_systemIO; }
 
     static Engine *Get();
 
@@ -35,13 +35,10 @@ class Engine {
     const std::filesystem::path _basePath;
     Common::INIFile _iniFile;
     Loader _loader;
-    bool _showSystemCursor;
-    std::string _bootText;
-    std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> _systemIO;
+    std::unique_ptr<AbyssEngine::SystemIO> _systemIO;
     std::mutex _mutex;
     std::map<std::string, LibAbyss::Palette> _palettes;
 };
-
 } // namespace AbyssEngine
 
 #endif // ABYSS_ENGINE_H

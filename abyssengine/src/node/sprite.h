@@ -16,7 +16,6 @@ class Sprite : public Node {
         int OffsetY;
     };
 
-    Sprite();
     void UpdateCallback(uint32_t ticks) final;
     void RenderCallback(int offsetX, int offsetY) final;
     void MouseEventCallback(MouseEventInfo eventInfo) final;
@@ -32,12 +31,12 @@ class Sprite : public Node {
     void Animate(float time_elapsed);
     void AdvanceFrame();
 
-    std::unique_ptr<AbyssEngine::SystemIO::ITexture> _atlas;
+    std::unique_ptr<ITexture> _atlas;
     std::vector<FramePosition> _framePositions;
     bool _bottomOrigin = false;
-    uint32_t _cellSizeX = 0;
-    uint32_t _cellSizeY = 0;
-    PlayMode _playMode = PlayMode::Unknown;
+    uint32_t _cellSizeX = 1;
+    uint32_t _cellSizeY = 1;
+    PlayMode _playMode = PlayMode::Paused;
     bool _loopAnimation = false;
     float _lastFrameTime = 0;
     float _playLength = 0;

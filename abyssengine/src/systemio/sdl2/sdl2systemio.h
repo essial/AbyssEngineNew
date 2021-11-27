@@ -5,9 +5,9 @@
 #include <SDL2/SDL.h>
 #include <string>
 
-namespace AbyssEngine::SystemIO::SDL2 {
+namespace AbyssEngine::SDL2 {
 
-    class SDL2SystemIO : public ISystemIO {
+    class SDL2SystemIO : public SystemIO {
     public:
         SDL2SystemIO();
 

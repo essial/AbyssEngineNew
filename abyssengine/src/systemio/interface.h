@@ -4,9 +4,12 @@
 #include <string>
 #include <vector>
 #include <span>
+#include <mutex>
 #include "../common/rectangle.h"
 
-namespace AbyssEngine::SystemIO {
+namespace AbyssEngine {
+
+class Sprite;
 
 class ITexture {
   public:
@@ -15,9 +18,9 @@ class ITexture {
     virtual void Render(const AbyssEngine::Rectangle &sourceRect, const AbyssEngine::Rectangle &destRect) = 0;
 };
 
-class ISystemIO {
+class SystemIO {
   public:
-    virtual ~ISystemIO() = default;
+    virtual ~SystemIO() = default;
     virtual std::string_view Name() = 0;
 
     /// Pauses the audio subsystem.
@@ -40,6 +43,18 @@ class ISystemIO {
     /// \return A new texture instance.
     virtual std::unique_ptr<ITexture> CreateTexture(uint32_t width, uint32_t height) = 0;
 
+    void SetCursorSprite (Sprite *cursorSprite, int offsetX, int offsetY);
+    void ShowSystemCursor(bool show);
+
+  protected:
+    Sprite* _cursorSprite = nullptr;
+    bool _showSystemCursor = false;
+    int _cursorX = 0;
+    int _cursorY = 0;
+    int _cursorOffsetX = 0;
+    int _cursorOffsetY = 0;
+
+    std::mutex _mutex;
 };
 
 } // namespace AbyssEngine::SystemIO

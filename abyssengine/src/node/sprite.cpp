@@ -1,7 +1,5 @@
 #include "sprite.h"
 
-AbyssEngine::Sprite::Sprite() : _atlas(), _framePositions() {}
-
 void AbyssEngine::Sprite::UpdateCallback(uint32_t ticks) {
     if (!Active)
         return;

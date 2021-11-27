@@ -1,13 +1,13 @@
 #include "engine.h"
 #include "../hostnotify/hostnotify.h"
-#include "filesystemprovider.h"
 #include "../scripting/scripthost.h"
+#include "filesystemprovider.h"
 #include <spdlog/spdlog.h>
 
 AbyssEngine::Engine *_engineGlobalInstance = nullptr;
 
-AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO::ISystemIO> systemIo)
-    : _iniFile(std::move(iniFile)), _systemIO(std::move(systemIo)), _loader(), _bootText(), _palettes() {
+AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO> systemIo)
+    : _iniFile(std::move(iniFile)), _systemIO(std::move(systemIo)), _loader(), _palettes() {
     SPDLOG_TRACE("creating engine");
     _engineGlobalInstance = this;
     _systemIO->SetFullscreen(_iniFile.GetValueBool("Video", "FullScreen"));
@@ -28,7 +28,6 @@ void AbyssEngine::Engine::ScriptingThread() {
 
     ScriptHost scriptHost(this);
     try {
-        //scriptHost.ExecuteString("dofile \"bootstrap\"");
         scriptHost.ExecuteFile("bootstrap.lua");
     } catch (std::exception &ex) {
         SPDLOG_ERROR("Lua Error:\n{0}", ex.what());
@@ -45,19 +44,8 @@ void AbyssEngine::Engine::Stop() {
     _systemIO->Stop();
 }
 
-void AbyssEngine::Engine::ShowSystemCursor(bool show) {
-    std::lock_guard<std::mutex> guard(_mutex);
-
-    _showSystemCursor = show;
-}
-
-void AbyssEngine::Engine::SetBootText(std::string_view text) {
-    std::lock_guard<std::mutex> guard(_mutex);
-
-    _bootText = text;
-}
-
 void AbyssEngine::Engine::AddPalette(std::string_view paletteName, const LibAbyss::Palette &palette) {
+    std::lock_guard<std::mutex> guard(_mutex);
     _palettes.emplace(paletteName, palette);
 }
 
