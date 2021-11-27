@@ -1,5 +1,5 @@
-#ifndef ABYSS_INPUTSTREAM_H
-#define ABYSS_INPUTSTREAM_H
+#ifndef LIBABYSS_INPUTSTREAM_H
+#define LIBABYSS_INPUTSTREAM_H
 
 #include <istream>
 #include <streambuf>
@@ -16,4 +16,4 @@ namespace LibAbyss {
     };
 }
 
-#endif // ABYSS_INPUTSTREAM_H
+#endif // LIBABYSS_INPUTSTREAM_H

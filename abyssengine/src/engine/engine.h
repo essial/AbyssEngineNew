@@ -4,9 +4,10 @@
 #include "../common/inifile.h"
 #include "../scripting/scripthost.h"
 #include "../systemio/interface.h"
-#include "loader.h"
 #include "libabyss/palette.h"
+#include "loader.h"
 #include <filesystem>
+#include <map>
 #include <mutex>
 #include <thread>
 
@@ -22,9 +23,14 @@ class Engine {
     void ScriptingThreadBootstrap();
     void ShowSystemCursor(bool show);
     void SetBootText(std::string_view text);
-    void AddPalette(std::unique_ptr<LibAbyss::Palette> palette);
+    void AddPalette(std::string_view paletteName, const LibAbyss::Palette &palette);
     Loader &GetLoader() { return _loader; }
     Common::INIFile &GetIniFile() { return _iniFile; }
+    SystemIO::ISystemIO &GetSystemIO() { return *_systemIO; }
+
+    static Engine *Get();
+
+    const LibAbyss::Palette &GetPalette(std::string_view paletteName) const;
 
   private:
     const std::filesystem::path _basePath;
@@ -34,7 +40,7 @@ class Engine {
     std::string _bootText;
     std::unique_ptr<AbyssEngine::SystemIO::ISystemIO> _systemIO;
     std::mutex _mutex;
-    std::vector<std::unique_ptr<LibAbyss::Palette>> _palettes;
+    std::map<std::string, LibAbyss::Palette> _palettes;
 };
 
 } // namespace AbyssEngine

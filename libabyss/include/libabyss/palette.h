@@ -1,5 +1,5 @@
-#ifndef ABYSS_PALETTE_H
-#define ABYSS_PALETTE_H
+#ifndef LIBABYSS_PALETTE_H
+#define LIBABYSS_PALETTE_H
 
 #include <cstdint>
 #include <vector>
@@ -33,10 +33,15 @@ namespace LibAbyss {
             Blue = 0;
             Alpha = 0;
         }
+
         uint8_t Red;
         uint8_t Green;
         uint8_t Blue;
         uint8_t Alpha;
+
+        explicit operator uint32_t() const {
+            return ((uint32_t)Blue) | ((uint32_t)Green << 8) | ((uint32_t)Red << 16) | ((uint32_t)Alpha << 24);
+        }
     };
 
     class Palette {
@@ -70,4 +75,4 @@ namespace LibAbyss {
 
 }
 
-#endif //ABYSS_PALETTE_H
+#endif //LIBABYSS_PALETTE_H

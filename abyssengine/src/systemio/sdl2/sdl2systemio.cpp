@@ -1,11 +1,12 @@
 #include "sdl2systemio.h"
+#include "../../hostnotify/hostnotify.h"
 #include "config.h"
+#include "sdl2texture.h"
 #include <SDL.h>
 #include <SDL_hints.h>
 #include <SDL_stdinc.h>
-#include <spdlog/spdlog.h>
-#include "../../hostnotify/hostnotify.h"
 #include <SDL_syswm.h>
+#include <spdlog/spdlog.h>
 #ifdef __APPLE__
 #include "../../hostnotify/hostnotify_mac_shim.h"
 #endif // __APPLE__
@@ -105,6 +106,8 @@ void AbyssEngine::SystemIO::SDL2::SDL2SystemIO::HandleSdlEvent(const SDL_Event &
     }
 }
 
-void AbyssEngine::SystemIO::SDL2::SDL2SystemIO::Stop() {
-    _runMainLoop = false;
+void AbyssEngine::SystemIO::SDL2::SDL2SystemIO::Stop() { _runMainLoop = false; }
+
+std::unique_ptr<AbyssEngine::SystemIO::ITexture> AbyssEngine::SystemIO::SDL2::SDL2SystemIO::CreateTexture(uint32_t width, uint32_t height) {
+    return std::make_unique<SDL2Texture>(_sdlRenderer, width, height);
 }

@@ -7,7 +7,7 @@
 
 namespace AbyssEngine::SystemIO::SDL2 {
 
-    class SDL2SystemIO : public AbyssEngine::SystemIO::ISystemIO {
+    class SDL2SystemIO : public ISystemIO {
     public:
         SDL2SystemIO();
 
@@ -23,7 +23,9 @@ namespace AbyssEngine::SystemIO::SDL2 {
 
         void Stop() final;
 
-    private:
+        std::unique_ptr<ITexture> CreateTexture(uint32_t width, uint32_t height) final;
+
+      private:
         SDL_Window *_sdlWindow;
         SDL_Renderer *_sdlRenderer;
         bool _runMainLoop;

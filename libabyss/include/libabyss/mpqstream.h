@@ -1,5 +1,5 @@
-#ifndef ABYSS_MPQSTREAM_H
-#define ABYSS_MPQSTREAM_H
+#ifndef LIBABYSS_MPQSTREAM_H
+#define LIBABYSS_MPQSTREAM_H
 
 #include <ios>
 #include <streambuf>
@@ -34,4 +34,4 @@ namespace LibAbyss {
 
 }
 
-#endif //ABYSS_MPQSTREAM_H
+#endif //LIBABYSS_MPQSTREAM_H

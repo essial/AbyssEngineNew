@@ -16,6 +16,7 @@ class Node {
     virtual void MouseEventCallback(Engine &engine, MouseEventInfo eventInfo){};
     void GetEffectiveLayout(int &x, int &y);
     void AppendChild(std::unique_ptr<Node> childNode);
+    void RemoveChild(Node *nodeRef);
 
     int X = 0;
     int Y = 0;

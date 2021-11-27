@@ -107,10 +107,16 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/engine/loader.cpp
         src/engine/filesystemprovider.cpp
         src/engine/mpqprovider.cpp
-        src/systemio/sdl2/sdl2systemio.cpp
+        src/engine/spritefont.cpp
+        src/node/sprite.cpp
+        src/node/dc6sprite.cpp
         src/common/inifile.cpp
         src/scripting/scripthost.cpp
         src/node/node.cpp
+
+        # SystemID - SDL2 ----------------------------------------------
+        src/systemio/sdl2/sdl2systemio.cpp
+        src/systemio/sdl2/sdl2texture.cpp
 
         # Dynamic ------------------------------------------------------
         ${SOURCE_EXTRA}

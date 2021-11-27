@@ -38,6 +38,8 @@ add_library(${PROJECT_NAME}
         src/mpq.cpp
         src/mpqstream.cpp
         src/palette.cpp
+        src/dc6.cpp
+        src/streamreader.cpp
         )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

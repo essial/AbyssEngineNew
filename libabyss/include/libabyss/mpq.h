@@ -1,5 +1,5 @@
-#ifndef ABYSS_MPQ_H
-#define ABYSS_MPQ_H
+#ifndef LIBABYSS_MPQ_H
+#define LIBABYSS_MPQ_H
 
 #define STORMLIB_NO_AUTO_LINK 1
 
@@ -39,4 +39,4 @@ namespace LibAbyss {
 
 } // namespace LibAbyss
 
-#endif // ABYSS_MPQ_H
+#endif // LIBABYSS_MPQ_H
