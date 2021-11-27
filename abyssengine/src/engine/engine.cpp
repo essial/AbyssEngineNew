@@ -28,7 +28,8 @@ void AbyssEngine::Engine::ScriptingThread() {
 
     ScriptHost scriptHost(this);
     try {
-        scriptHost.ExecuteString("dofile \"bootstrap\"");
+        //scriptHost.ExecuteString("dofile \"bootstrap\"");
+        scriptHost.ExecuteFile("bootstrap.lua");
     } catch (std::exception &ex) {
         SPDLOG_ERROR("Lua Error:\n{0}", ex.what());
         AbyssEngine::HostNotify::Notify(AbyssEngine::eNotifyType::Fatal, "Script Error", ex.what());

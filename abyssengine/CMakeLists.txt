@@ -111,8 +111,10 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/node/sprite.cpp
         src/node/dc6sprite.cpp
         src/common/inifile.cpp
-        src/scripting/scripthost.cpp
         src/node/node.cpp
+
+        # Scripting ----------------------------------------------------
+        src/scripting/scripthost.cpp
 
         # SystemID - SDL2 ----------------------------------------------
         src/systemio/sdl2/sdl2systemio.cpp

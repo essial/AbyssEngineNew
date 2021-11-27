@@ -6,6 +6,7 @@
 #include "../node/sprite.h"
 #include <filesystem>
 
+
 namespace AbyssEngine {
 
 class Engine;
@@ -14,6 +15,7 @@ class ScriptHost {
   public:
     explicit ScriptHost(Engine *engine);
     void ExecuteString(std::string_view code);
+    void ExecuteFile(std::string_view path);
 
   private:
     Engine *_engine;
@@ -35,7 +37,7 @@ class ScriptHost {
     void LuaAddLoaderProvider(std::string_view providerType, std::string_view providerPath);
     void LuaLoadPalette(std::string_view paletteName, std::string_view path);
     bool LuaFileExists(std::string_view fileName);
-    // AbyssEngine::Sprite* AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName);
+    std::unique_ptr<AbyssEngine::Sprite> LuaLoadSprite(std::string_view spritePath, std::string_view paletteName);
 };
 
 } // namespace AbyssEngine

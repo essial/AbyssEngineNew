@@ -9,7 +9,7 @@ namespace AbyssEngine {
 
 class DC6Sprite : public Sprite {
   public:
-    explicit DC6Sprite(LibAbyss::InputStream &stream, LibAbyss::Palette &palette);
+    explicit DC6Sprite(LibAbyss::InputStream &stream, const LibAbyss::Palette &palette);
 
     void GetFrameOffset(uint32_t frame, int &offsetX, int &offsetY) final;
     void GetFrameSize(uint32_t frame, uint32_t &width, uint32_t &height) final;
@@ -21,7 +21,7 @@ class DC6Sprite : public Sprite {
 
   private:
     LibAbyss::DC6 _dc6;
-    LibAbyss::Palette &_palette;
+    const LibAbyss::Palette &_palette;
 };
 
 } // namespace AbyssEngine

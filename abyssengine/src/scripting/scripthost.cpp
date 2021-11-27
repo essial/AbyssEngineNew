@@ -1,10 +1,12 @@
 #include "scripthost.h"
+#include "../engine/engine.h"
 #include "../engine/filesystemprovider.h"
 #include "../engine/mpqprovider.h"
 #include "../engine/spritefont.h"
-#include "../engine/engine.h"
+#include "../node/dc6sprite.h"
 #include <absl/strings/ascii.h>
 #include <filesystem>
+#include <sol/sol.hpp>
 #include <spdlog/spdlog.h>
 
 AbyssEngine::ScriptHost::ScriptHost(Engine *engine) : _lua(), _engine(engine) {
@@ -36,8 +38,10 @@ AbyssEngine::ScriptHost::ScriptHost(Engine *engine) : _lua(), _engine(engine) {
     _environment.set_function("loadPalette", &ScriptHost::LuaLoadPalette, this);
     _environment.set_function("fileExists", &ScriptHost::LuaFileExists, this);
 
+    auto spriteObject = _environment.set_function("loadSprite", &ScriptHost::LuaLoadSprite, this);
+
     // User Types
-    _environment.new_usertype<AbyssEngine::SpriteFont>("SpriteFont", "new", sol::constructors<SpriteFont(std::string, std::string)>());
+    _environment.new_usertype<SpriteFont>("SpriteFont", "new", sol::constructors<SpriteFont(std::string_view, std::string_view)>());
 }
 
 std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadString(const std::string_view str, std::string_view chunkName) {
@@ -56,6 +60,8 @@ std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadString(cons
 
     return std::make_tuple(func, sol::nil);
 }
+
+void AbyssEngine::ScriptHost::ExecuteFile(std::string_view path) { LuaLoadFile(path); }
 
 std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadFile(std::string_view pathStr) {
     std::filesystem::path path(pathStr);
@@ -181,11 +187,18 @@ bool AbyssEngine::ScriptHost::LuaFileExists(std::string_view fileName) {
     auto path = std::filesystem::path(fileName);
     return _engine->GetLoader().FileExists(path);
 }
-//AbyssEngine::Sprite* AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
-//    if (absl::AsciiStrToLower(spritePath).ends_with(".dc6")) {
-//        auto palette = _engine->GetPalette(paletteName);
-//        return new DC6Sprite(spritePath, palette);
-//    }
-//
-//
-//}
+std::unique_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
+    const auto &engine = AbyssEngine::Engine::Get();
+    const std::filesystem::path path(spritePath);
+
+    if (!engine->GetLoader().FileExists(path))
+        throw std::runtime_error("File not found: " + std::string(spritePath));
+
+    auto stream = engine->GetLoader().Load(path);
+    const auto &palette = engine->GetPalette(paletteName);
+
+    if (absl::AsciiStrToLower(spritePath).ends_with(".dc6")) {
+        return std::make_unique<DC6Sprite>(stream, palette);
+    } else
+        throw std::runtime_error(absl::StrCat("Unknowns sprite format for file: ", spritePath));
+}

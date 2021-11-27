@@ -29,7 +29,7 @@ class Engine {
 
     static Engine *Get();
 
-    const LibAbyss::Palette &GetPalette(std::string_view paletteName) const;
+    [[nodiscard]] const LibAbyss::Palette &GetPalette(std::string_view paletteName) const;
 
   private:
     const std::filesystem::path _basePath;

@@ -1,7 +1,7 @@
 #include "dc6sprite.h"
 #include "../engine/engine.h"
 
-AbyssEngine::DC6Sprite::DC6Sprite(LibAbyss::InputStream &stream, LibAbyss::Palette &palette) : _palette(palette), _dc6(stream) {
+AbyssEngine::DC6Sprite::DC6Sprite(LibAbyss::InputStream &stream, const LibAbyss::Palette &palette) : _palette(palette), _dc6(stream) {
     if (_dc6.FramesPerDirection == 0 || _dc6.NumberOfDirections == 0)
         throw std::runtime_error("DC6 has no frames!");
 }
