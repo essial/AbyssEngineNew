@@ -36,8 +36,8 @@ class ScriptHost {
     void LuaAddLoaderProvider(std::string_view providerType, std::string_view providerPath);
     void LuaLoadPalette(std::string_view paletteName, std::string_view path);
     bool LuaFileExists(std::string_view fileName);
-    AbyssEngine::Sprite* LuaLoadSprite(std::string_view spritePath, std::string_view paletteName);
-    void LuaSetCursor(Sprite& sprite, int offsetX, int offsetY);
+    std::shared_ptr<AbyssEngine::Sprite> LuaLoadSprite(std::string_view spritePath, std::string_view paletteName);
+    void LuaSetCursor(std::shared_ptr<Sprite> sprite, int offsetX, int offsetY);
 };
 
 } // namespace AbyssEngine

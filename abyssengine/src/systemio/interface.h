@@ -44,11 +44,11 @@ class SystemIO {
     /// \return A new texture instance.
     virtual std::unique_ptr<ITexture> CreateTexture(uint32_t width, uint32_t height) = 0;
 
-    void SetCursorSprite (Sprite *cursorSprite, int offsetX, int offsetY);
+    void SetCursorSprite (std::shared_ptr<Sprite> cursorSprite, int offsetX, int offsetY);
     void ShowSystemCursor(bool show);
 
   protected:
-    Sprite* _cursorSprite = nullptr;
+    std::shared_ptr<Sprite> _cursorSprite;
     bool _showSystemCursor = false;
     int _cursorX = 0;
     int _cursorY = 0;
