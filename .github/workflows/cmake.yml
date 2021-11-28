@@ -47,9 +47,7 @@ jobs:
 
       - name: Install Deps (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        run: >-
-          sudo apt-get install nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 120 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-13
+        run: sudo apt-get install nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
 
       - name: Set up Clang (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
