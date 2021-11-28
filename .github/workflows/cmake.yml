@@ -50,9 +50,15 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" && sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get install gcc-10 gcc-10-base gcc-10-doc g++-10 libstdc++-10-dev nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev libstdc++-10-dev && echo "CC=clang" >> $GITHUB_ENV && echo "CXX=clang++" >> $GITHUB_ENV
 
+      - name: Install LLVM and Clang (MacOS)
+        if: matrix.os = 'macos-11'
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "13.0"
+
       - name: Install Deps (MacOS)
         if: matrix.os == 'macos-11'
-        run: brew install llvm nasm ffmpeg && brew link llvm --force
+        run: brew install nasm ffmpeg
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10
