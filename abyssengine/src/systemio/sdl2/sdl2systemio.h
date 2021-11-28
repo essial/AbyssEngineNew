@@ -18,7 +18,7 @@ class SDL2SystemIO : public SystemIO {
     void SetFullscreen(bool fullscreen) final;
     void RunMainLoop(Node &rootNode) final;
     void Stop() final;
-    std::unique_ptr<ITexture> CreateTexture(uint32_t width, uint32_t height) final;
+    std::unique_ptr<ITexture> CreateTexture(ITexture::Format textureFormat, uint32_t width, uint32_t height) final;
     void PushAudioData(std::span<const char> data) final;
 
   private:

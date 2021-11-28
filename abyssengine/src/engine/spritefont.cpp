@@ -91,7 +91,7 @@ void AbyssEngine::SpriteFont::RegenerateAtlas() {
 
     atlasHeight += curHeight;
 
-    _atlas = Engine::Get()->GetSystemIO().CreateTexture(atlasWidth, atlasHeight);
+    _atlas = Engine::Get()->GetSystemIO().CreateTexture(ITexture::Format::Static, atlasWidth, atlasHeight);
     _frameRects.clear();
     _frameRects.resize(_dc6->FramesPerDirection);
     std::vector<uint32_t> buffer;

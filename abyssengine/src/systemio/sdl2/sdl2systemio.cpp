@@ -152,8 +152,9 @@ void AbyssEngine::SDL2::SDL2SystemIO::Stop() {
     _runMainLoop = false;
 }
 
-std::unique_ptr<AbyssEngine::ITexture> AbyssEngine::SDL2::SDL2SystemIO::CreateTexture(uint32_t width, uint32_t height) {
-    return std::make_unique<SDL2Texture>(_sdlRenderer, width, height);
+std::unique_ptr<AbyssEngine::ITexture> AbyssEngine::SDL2::SDL2SystemIO::CreateTexture(ITexture::Format textureFormat, uint32_t width,
+                                                                                      uint32_t height) {
+    return std::make_unique<SDL2Texture>(_sdlRenderer, textureFormat, width, height);
 }
 void AbyssEngine::SDL2::SDL2SystemIO::InitializeAudio() {
     SDL_AudioSpec requestedAudioSpec{
@@ -181,15 +182,11 @@ void AbyssEngine::SDL2::SDL2SystemIO::HandleAudioCallback(void *userData, Uint8 
     source->HandleAudio(stream, length);
 }
 
-void AbyssEngine::SDL2::SDL2SystemIO::HandleAudio(uint8_t *stream, int length) {
-    _audioBuffer.ReadData((char*)stream, length);
-}
+void AbyssEngine::SDL2::SDL2SystemIO::HandleAudio(uint8_t *stream, int length) { _audioBuffer.ReadData((char *)stream, length); }
 void AbyssEngine::SDL2::SDL2SystemIO::FinalizeAudio() const {
     if (!_hasAudio)
         return;
 
     SDL_CloseAudioDevice(_audioDeviceId);
 }
-void AbyssEngine::SDL2::SDL2SystemIO::PushAudioData(std::span<const char> data) {
-    _audioBuffer.PushData(data);
-}
+void AbyssEngine::SDL2::SDL2SystemIO::PushAudioData(std::span<const char> data) { _audioBuffer.PushData(data); }

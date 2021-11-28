@@ -48,7 +48,7 @@ void AbyssEngine::DC6Sprite::RegenerateAtlas() {
     if (atlasWidth == 0 || atlasHeight == 0)
         throw std::runtime_error("DC6 atlas has no calculated size!");
 
-    _atlas = Engine::Get()->GetSystemIO().CreateTexture(atlasWidth, atlasHeight);
+    _atlas = Engine::Get()->GetSystemIO().CreateTexture(ITexture::Format::Static, atlasWidth, atlasHeight);
 
     _framePositions.clear();
     _framePositions.resize(_dc6.NumberOfDirections * _dc6.FramesPerDirection);
