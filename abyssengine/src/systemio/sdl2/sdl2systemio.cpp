@@ -1,5 +1,6 @@
 #include "sdl2systemio.h"
 #include "../../hostnotify/hostnotify.h"
+#include "../../node/node.h"
 #include "../../node/sprite.h"
 #include "config.h"
 #include "sdl2texture.h"
@@ -9,13 +10,19 @@
 #include <SDL_syswm.h>
 #include <spdlog/spdlog.h>
 #ifdef __APPLE__
+#include "../../engine/engine.h"
 #include "../../hostnotify/hostnotify_mac_shim.h"
 #endif // __APPLE__
 
-AbyssEngine::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemIO::SystemIO(), _runMainLoop(false) {
+namespace {
+const int AudioBufferSize = 1024 * 128;
+}
+
+AbyssEngine::SDL2::SDL2SystemIO::SDL2SystemIO()
+    : AbyssEngine::SystemIO::SystemIO(), _runMainLoop(false), _audioBuffer(AudioBufferSize), _audioSpec() {
     SPDLOG_TRACE("Creating SDL2 System IO");
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_AUDIO) != 0)
         throw std::runtime_error(SDL_GetError());
 
     _sdlWindow = SDL_CreateWindow(ABYSS_VERSION_STRING, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600,
@@ -46,7 +53,7 @@ AbyssEngine::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemIO::SystemI
     SDL_RendererInfo renderInfo;
     SDL_GetRendererInfo(_sdlRenderer, &renderInfo);
 
-    SPDLOG_INFO("Using '{0}' graphics rendering API", renderInfo.name);
+    SPDLOG_INFO("Using {0} graphics rendering API", renderInfo.name);
     SPDLOG_INFO("Max texture size: {0}x{1}", renderInfo.max_texture_width, renderInfo.max_texture_height);
 
     SDL_version sdlVersion;
@@ -57,11 +64,15 @@ AbyssEngine::SDL2::SDL2SystemIO::SDL2SystemIO() : AbyssEngine::SystemIO::SystemI
     SDL_RenderSetLogicalSize(_sdlRenderer, 800, 600);
     SDL_ShowCursor(SDL_FALSE);
 
+    InitializeAudio();
+
     PauseAudio(false);
 }
 
 AbyssEngine::SDL2::SDL2SystemIO::~SDL2SystemIO() {
     SPDLOG_TRACE("Destroying SDL2 System IO");
+
+    FinalizeAudio();
 
 #ifdef __APPLE__
     AbyssHostNotifyFinalizeMac();
@@ -78,11 +89,16 @@ AbyssEngine::SDL2::SDL2SystemIO::~SDL2SystemIO() {
 
 std::string_view AbyssEngine::SDL2::SDL2SystemIO::Name() { return "SDL2"; }
 
-void AbyssEngine::SDL2::SDL2SystemIO::PauseAudio(bool pause) {}
+void AbyssEngine::SDL2::SDL2SystemIO::PauseAudio(bool pause) {
+    if (!_hasAudio)
+        return;
+
+    SDL_PauseAudioDevice(_audioDeviceId, pause ? SDL_TRUE : SDL_FALSE);
+}
 
 void AbyssEngine::SDL2::SDL2SystemIO::SetFullscreen(bool fullscreen) { SDL_SetWindowFullscreen(_sdlWindow, fullscreen ? SDL_TRUE : SDL_FALSE); }
 
-void AbyssEngine::SDL2::SDL2SystemIO::RunMainLoop() {
+void AbyssEngine::SDL2::SDL2SystemIO::RunMainLoop(Node &rootNode) {
     SPDLOG_TRACE("Starting main loop");
 
     SDL_Event sdlEvent;
@@ -90,12 +106,14 @@ void AbyssEngine::SDL2::SDL2SystemIO::RunMainLoop() {
     _runMainLoop = true;
     while (_runMainLoop) {
         while (SDL_PollEvent(&sdlEvent)) {
-            HandleSdlEvent(sdlEvent);
+            HandleSdlEvent(sdlEvent, rootNode);
         }
         {
             std::lock_guard<std::mutex> guard(_mutex);
 
             SDL_RenderClear(_sdlRenderer);
+
+            rootNode.RenderCallback(0, 0);
 
             if (_showSystemCursor && _cursorSprite != nullptr) {
                 _cursorSprite->X = _cursorX;
@@ -110,7 +128,7 @@ void AbyssEngine::SDL2::SDL2SystemIO::RunMainLoop() {
     SPDLOG_TRACE("Leaving main loop");
 }
 
-void AbyssEngine::SDL2::SDL2SystemIO::HandleSdlEvent(const SDL_Event &sdlEvent) {
+void AbyssEngine::SDL2::SDL2SystemIO::HandleSdlEvent(const SDL_Event &sdlEvent, Node &rootNode) {
     switch (sdlEvent.type) {
     case SDL_MOUSEMOTION:
         _cursorX = sdlEvent.motion.x;
@@ -136,4 +154,42 @@ void AbyssEngine::SDL2::SDL2SystemIO::Stop() {
 
 std::unique_ptr<AbyssEngine::ITexture> AbyssEngine::SDL2::SDL2SystemIO::CreateTexture(uint32_t width, uint32_t height) {
     return std::make_unique<SDL2Texture>(_sdlRenderer, width, height);
+}
+void AbyssEngine::SDL2::SDL2SystemIO::InitializeAudio() {
+    SDL_AudioSpec requestedAudioSpec{
+        .freq = 44100,
+        .format = AUDIO_S16LSB,
+        .channels = 2,
+        .samples = 1024,
+        .callback = SDL2SystemIO::HandleAudioCallback,
+        .userdata = this,
+    };
+
+    _audioDeviceId = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &requestedAudioSpec, &_audioSpec, 0);
+    _hasAudio = _audioDeviceId >= 0;
+
+    if (!_hasAudio) {
+        SPDLOG_WARN(SDL_GetError());
+        return;
+    }
+
+    SPDLOG_INFO("Using audio device {0} via {1}", SDL_GetAudioDeviceName(_audioDeviceId, SDL_FALSE), SDL_GetCurrentAudioDriver());
+}
+
+void AbyssEngine::SDL2::SDL2SystemIO::HandleAudioCallback(void *userData, Uint8 *stream, int length) {
+    auto *source = (SDL2SystemIO *)userData;
+    source->HandleAudio(stream, length);
+}
+
+void AbyssEngine::SDL2::SDL2SystemIO::HandleAudio(uint8_t *stream, int length) {
+    _audioBuffer.ReadData((char*)stream, length);
+}
+void AbyssEngine::SDL2::SDL2SystemIO::FinalizeAudio() const {
+    if (!_hasAudio)
+        return;
+
+    SDL_CloseAudioDevice(_audioDeviceId);
+}
+void AbyssEngine::SDL2::SDL2SystemIO::PushAudioData(std::span<const char> data) {
+    _audioBuffer.PushData(data);
 }

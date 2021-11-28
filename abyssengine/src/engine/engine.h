@@ -23,6 +23,7 @@ class Engine {
     void Stop();
     void ScriptingThread();
     void AddPalette(std::string_view paletteName, const LibAbyss::Palette &palette);
+    Node &GetRootNode();
 
     Loader &GetLoader() { return _loader; }
     Common::INIFile &GetIniFile() { return _iniFile; }
@@ -40,6 +41,7 @@ class Engine {
     std::mutex _mutex;
     std::map<std::string, LibAbyss::Palette> _palettes;
     std::unique_ptr<ScriptHost> _scriptHost;
+    Node _rootNode;
 };
 } // namespace AbyssEngine
 

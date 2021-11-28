@@ -38,6 +38,7 @@ AbyssEngine::ScriptHost::ScriptHost(Engine *engine) : _lua(), _engine(engine) {
     _environment.set_function("loadPalette", &ScriptHost::LuaLoadPalette, this);
     _environment.set_function("fileExists", &ScriptHost::LuaFileExists, this);
     _environment.set_function("setCursor", &ScriptHost::LuaSetCursor, this);
+    _environment.set_function("getRootNode", &ScriptHost::LuaGetRootNode, this);
 
     auto spriteObject = _environment.set_function("loadSprite", &ScriptHost::LuaLoadSprite, this);
 
@@ -62,9 +63,7 @@ std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadString(cons
     return std::make_tuple(func, sol::nil);
 }
 
-void AbyssEngine::ScriptHost::ExecuteFile(std::string_view path) {
-    LuaLoadFile(path);
-}
+void AbyssEngine::ScriptHost::ExecuteFile(std::string_view path) { LuaLoadFile(path); }
 
 std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadFile(std::string_view pathStr) {
     std::filesystem::path path(pathStr);
@@ -188,6 +187,7 @@ bool AbyssEngine::ScriptHost::LuaFileExists(std::string_view fileName) {
     auto path = std::filesystem::path(fileName);
     return _engine->GetLoader().FileExists(path);
 }
+
 std::unique_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
     const auto &engine = AbyssEngine::Engine::Get();
     const std::filesystem::path path(spritePath);
@@ -203,6 +203,9 @@ std::unique_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std:
     } else
         throw std::runtime_error(absl::StrCat("Unknowns sprite format for file: ", spritePath));
 }
-void AbyssEngine::ScriptHost::LuaSetCursor(Sprite& sprite, int offsetX, int offsetY) {
+
+void AbyssEngine::ScriptHost::LuaSetCursor(Sprite &sprite, int offsetX, int offsetY) {
     _engine->GetSystemIO().SetCursorSprite(&sprite, offsetX, offsetY);
 }
+
+AbyssEngine::Node &AbyssEngine::ScriptHost::LuaGetRootNode() { return AbyssEngine::Engine::Get()->GetRootNode(); }

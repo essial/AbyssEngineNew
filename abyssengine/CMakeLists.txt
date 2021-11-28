@@ -111,6 +111,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/node/sprite.cpp
         src/node/dc6sprite.cpp
         src/common/inifile.cpp
+        src/common/ringbuffer.cpp
         src/node/node.cpp
         src/systemio/interface.cpp
 

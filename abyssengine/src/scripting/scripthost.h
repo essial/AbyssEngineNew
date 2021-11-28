@@ -1,7 +1,10 @@
 #ifndef ABYSS_SCRIPTHOST_H
 #define ABYSS_SCRIPTHOST_H
 
+// This must be first for some reason---
 #include <sol/sol.hpp>
+// -------------------------------------
+
 #include "../engine/provider.h"
 #include "../node/sprite.h"
 #include <filesystem>
@@ -36,7 +39,8 @@ class ScriptHost {
     void LuaLoadPalette(std::string_view paletteName, std::string_view path);
     bool LuaFileExists(std::string_view fileName);
     std::unique_ptr<AbyssEngine::Sprite> LuaLoadSprite(std::string_view spritePath, std::string_view paletteName);
-    void LuaSetCursor(Sprite& sprite, int offsetX, int offsetY);
+    void LuaSetCursor(Sprite &sprite, int offsetX, int offsetY);
+    Node &LuaGetRootNode();
 };
 
 } // namespace AbyssEngine

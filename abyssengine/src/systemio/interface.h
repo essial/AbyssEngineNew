@@ -11,6 +11,7 @@
 namespace AbyssEngine {
 
 class Sprite;
+class Node;
 
 class ITexture {
   public:
@@ -33,7 +34,7 @@ class SystemIO {
     virtual void SetFullscreen(bool fullscreen) = 0;
 
     /// Starts the main system loop.
-    virtual void RunMainLoop() = 0;
+    virtual void RunMainLoop(Node &rootNode) = 0;
 
     /// Stops the main loop
     virtual void Stop() = 0;
@@ -44,7 +45,12 @@ class SystemIO {
     /// \return A new texture instance.
     virtual std::unique_ptr<ITexture> CreateTexture(uint32_t width, uint32_t height) = 0;
 
+    /// Writes data to the audio buffer.
+    /// \param data The data to write to the audio buffer.
+    virtual void PushAudioData(std::span<const char> data) = 0;
+
     void SetCursorSprite (Sprite* cursorSprite, int offsetX, int offsetY);
+
     void ShowSystemCursor(bool show);
 
   protected:

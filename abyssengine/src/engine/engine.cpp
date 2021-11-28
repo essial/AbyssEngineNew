@@ -8,7 +8,7 @@ AbyssEngine::Engine *_engineGlobalInstance = nullptr;
 
 AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO> systemIo)
     : _iniFile(std::move(iniFile)), _systemIO(std::move(systemIo)), _loader(), _palettes(),
-    _scriptHost(std::make_unique<ScriptHost>(this)) {
+    _scriptHost(std::make_unique<ScriptHost>(this)), _rootNode() {
     SPDLOG_TRACE("creating engine");
     _engineGlobalInstance = this;
     _systemIO->SetFullscreen(_iniFile.GetValueBool("Video", "FullScreen"));
@@ -18,7 +18,7 @@ void AbyssEngine::Engine::Run() {
     SPDLOG_TRACE("running engine");
     _loader.AddProvider(std::make_unique<FileSystemProvider>(std::filesystem::current_path()));
     std::thread scriptingThread([this] { ScriptingThread(); });
-    _systemIO->RunMainLoop();
+    _systemIO->RunMainLoop(_rootNode);
     scriptingThread.join();
 }
 
@@ -52,3 +52,5 @@ void AbyssEngine::Engine::AddPalette(std::string_view paletteName, const LibAbys
 AbyssEngine::Engine *AbyssEngine::Engine::Get() { return _engineGlobalInstance; }
 
 const LibAbyss::Palette &AbyssEngine::Engine::GetPalette(std::string_view paletteName) const { return _palettes.at(std::string(paletteName)); }
+
+AbyssEngine::Node &AbyssEngine::Engine::GetRootNode() { return _rootNode; }
