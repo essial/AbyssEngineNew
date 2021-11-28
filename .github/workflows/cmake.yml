@@ -52,7 +52,7 @@ jobs:
 
       - name: Install Deps (MacOS)
         if: matrix.os == 'macos-11'
-        run: brew install --with-toolchain llvm && brew install nasm ffmpeg
+        run: brew install llvm nasm ffmpeg
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10
