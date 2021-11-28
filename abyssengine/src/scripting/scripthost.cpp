@@ -62,7 +62,9 @@ std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadString(cons
     return std::make_tuple(func, sol::nil);
 }
 
-void AbyssEngine::ScriptHost::ExecuteFile(std::string_view path) { LuaLoadFile(path); }
+void AbyssEngine::ScriptHost::ExecuteFile(std::string_view path) {
+    LuaLoadFile(path);
+}
 
 std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadFile(std::string_view pathStr) {
     std::filesystem::path path(pathStr);
@@ -186,7 +188,7 @@ bool AbyssEngine::ScriptHost::LuaFileExists(std::string_view fileName) {
     auto path = std::filesystem::path(fileName);
     return _engine->GetLoader().FileExists(path);
 }
-std::shared_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
+std::unique_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
     const auto &engine = AbyssEngine::Engine::Get();
     const std::filesystem::path path(spritePath);
 
@@ -197,10 +199,10 @@ std::shared_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std:
     const auto &palette = engine->GetPalette(paletteName);
 
     if (absl::AsciiStrToLower(spritePath).ends_with(".dc6")) {
-        return std::make_shared<DC6Sprite>(stream, palette);
+        return std::make_unique<DC6Sprite>(stream, palette);
     } else
         throw std::runtime_error(absl::StrCat("Unknowns sprite format for file: ", spritePath));
 }
-void AbyssEngine::ScriptHost::LuaSetCursor(std::shared_ptr<Sprite> sprite, int offsetX, int offsetY) {
-    _engine->GetSystemIO().SetCursorSprite(std::move(sprite), offsetX, offsetY);
+void AbyssEngine::ScriptHost::LuaSetCursor(Sprite& sprite, int offsetX, int offsetY) {
+    _engine->GetSystemIO().SetCursorSprite(&sprite, offsetX, offsetY);
 }

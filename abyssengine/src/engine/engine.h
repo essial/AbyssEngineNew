@@ -3,6 +3,7 @@
 
 #include "../common/inifile.h"
 #include "../node/sprite.h"
+#include "../scripting/scripthost.h"
 #include "../systemio/interface.h"
 #include "libabyss/palette.h"
 #include "loader.h"
@@ -38,6 +39,7 @@ class Engine {
     std::unique_ptr<AbyssEngine::SystemIO> _systemIO;
     std::mutex _mutex;
     std::map<std::string, LibAbyss::Palette> _palettes;
+    std::unique_ptr<ScriptHost> _scriptHost;
 };
 } // namespace AbyssEngine
 
