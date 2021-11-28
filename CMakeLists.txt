@@ -13,7 +13,7 @@ endif (MSVC)
 if (UNIX)
     if (APPLE)
     else ()
-        add_definitions(-std=c++20)
+        add_definitions(-std=c++2a)
     endif ()
 endif ()
 
