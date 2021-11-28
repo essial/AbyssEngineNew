@@ -3,6 +3,7 @@
 
 #include "../common/events.h"
 #include <vector>
+#include <memory>
 
 namespace AbyssEngine {
 
