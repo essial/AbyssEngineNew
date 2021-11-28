@@ -14,17 +14,17 @@ class DC6 {
       public:
         class Frame {
           public:
-            Frame(StreamReader &sr);
-            uint32_t Flipped;
-            uint32_t Width;
-            uint32_t Height;
-            int32_t OffsetX;
-            int32_t OffsetY;
-            uint32_t Unknown;
-            uint32_t NextBlock;
-            uint32_t Length;
+            explicit Frame(StreamReader &sr);
+            uint32_t Flipped = 0;
+            uint32_t Width = 0;
+            uint32_t Height = 0;
+            int32_t OffsetX = 0;
+            int32_t OffsetY = 0;
+            uint32_t Unknown = 0;
+            uint32_t NextBlock = 0;
+            uint32_t Length = 0;
             std::vector<uint8_t> FrameData;
-            uint8_t Terminator[3];
+            uint8_t Terminator[3] = {};
             std::vector<uint8_t> IndexData;
           private:
             void Decode();

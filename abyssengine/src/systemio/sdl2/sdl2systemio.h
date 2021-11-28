@@ -4,6 +4,7 @@
 #include "../../common/ringbuffer.h"
 #include "../interface.h"
 #include <SDL2/SDL.h>
+#include <mutex>
 #include <string>
 
 namespace AbyssEngine::SDL2 {
@@ -20,6 +21,9 @@ class SDL2SystemIO : public SystemIO {
     void Stop() final;
     std::unique_ptr<ITexture> CreateTexture(ITexture::Format textureFormat, uint32_t width, uint32_t height) final;
     void PushAudioData(std::span<const char> data) final;
+    void PlayVideo(LibAbyss::InputStream stream, bool wait) final;
+    void WaitForVideoToFinish() final;
+    void NotifyVideoFinished() final;
 
   private:
     void InitializeAudio();
@@ -30,11 +34,16 @@ class SDL2SystemIO : public SystemIO {
 
     SDL_Window *_sdlWindow;
     SDL_Renderer *_sdlRenderer;
+
     bool _runMainLoop = false;
     bool _hasAudio = false;
     SDL_AudioSpec _audioSpec;
     SDL_AudioDeviceID _audioDeviceId = 0;
     RingBuffer _audioBuffer;
+    std::mutex _videoMutex;
+    bool _waitVideoPlayback = false;
+
+    std::unique_ptr<Node> _videoNode;
 };
 
 } // namespace AbyssEngine::SDL2

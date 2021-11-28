@@ -108,12 +108,15 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/engine/filesystemprovider.cpp
         src/engine/mpqprovider.cpp
         src/engine/spritefont.cpp
-        src/node/sprite.cpp
-        src/node/dc6sprite.cpp
         src/common/inifile.cpp
         src/common/ringbuffer.cpp
-        src/node/node.cpp
         src/systemio/interface.cpp
+
+        # Nodes --------------------------------------------------------
+        src/node/node.cpp
+        src/node/sprite.cpp
+        src/node/dc6sprite.cpp
+        src/node/video.cpp
 
         # Scripting ----------------------------------------------------
         src/scripting/scripthost.cpp
@@ -139,8 +142,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${CascLib_SOURCE_DIR}/src
         )
 
-target_link_libraries(${PROJECT_NAME}
-        PRIVATE
+message(Defs: ${FFMPEG_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
         libabyss
         absl::flat_hash_map
         Threads::Threads

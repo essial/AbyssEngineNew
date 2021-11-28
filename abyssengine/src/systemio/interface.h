@@ -2,6 +2,7 @@
 #define ABYSS_SYSTEMIO_INTERFACE_H
 
 #include "../common/rectangle.h"
+#include "libabyss/inputstream.h"
 #include <memory>
 #include <mutex>
 #include <span>
@@ -53,6 +54,17 @@ class SystemIO {
     /// Writes data to the audio buffer.
     /// \param data The data to write to the audio buffer.
     virtual void PushAudioData(std::span<const char> data) = 0;
+
+    /// Plays the specified video.
+    /// \param stream The video stream
+    /// \param wait If true, allows WaitForVideoToFinish() to halt thread before returning.
+    virtual void PlayVideo(LibAbyss::InputStream stream, bool wait) = 0;
+
+    /// When video is playing with wait set to true, this function will wait for video playback to complete.
+    virtual void WaitForVideoToFinish() = 0;
+
+    /// Notifies that video playback has finished.
+    virtual void NotifyVideoFinished() = 0;
 
     void SetCursorSprite(Sprite *cursorSprite, int offsetX, int offsetY);
 

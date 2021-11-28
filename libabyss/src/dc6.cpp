@@ -37,7 +37,7 @@ LibAbyss::DC6::DC6(LibAbyss::InputStream &stream) : Directions() {
     }
 }
 
-LibAbyss::DC6::Direction::Frame::Frame(StreamReader &sr) : FrameData(), Terminator() {
+LibAbyss::DC6::Direction::Frame::Frame(StreamReader &sr)  {
     Flipped = sr.ReadUInt32();
     Width = sr.ReadUInt32();
     Height = sr.ReadUInt32();

@@ -40,6 +40,7 @@ class ScriptHost {
     bool LuaFileExists(std::string_view fileName);
     std::unique_ptr<AbyssEngine::Sprite> LuaLoadSprite(std::string_view spritePath, std::string_view paletteName);
     void LuaSetCursor(Sprite &sprite, int offsetX, int offsetY);
+    void LuaPlayVideo(std::string_view videoPath, bool wait);
     Node &LuaGetRootNode();
 };
 

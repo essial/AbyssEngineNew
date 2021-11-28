@@ -5,6 +5,9 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(VCPKG_BUILD_TYPE release)
 endif ()
 
+set(VCPKG_LIBRARY_LINKAGE dynamic)
+set(VCPKG_BUILD_TYPE release)
+
 if (MSVC)
     # TODO: remove this when depending on CASC
     add_definitions(-DCASCLIB_NO_AUTO_LINK_LIBRARY)
@@ -28,3 +31,4 @@ add_subdirectory(libabyss)
 add_subdirectory(abyssengine)
 add_subdirectory(abysstoolset)
 add_subdirectory(tests)
+

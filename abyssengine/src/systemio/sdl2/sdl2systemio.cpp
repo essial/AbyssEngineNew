@@ -12,6 +12,7 @@
 #ifdef __APPLE__
 #include "../../engine/engine.h"
 #include "../../hostnotify/hostnotify_mac_shim.h"
+#include "../../node/video.h"
 #endif // __APPLE__
 
 namespace {
@@ -19,7 +20,7 @@ const int AudioBufferSize = 1024 * 128;
 }
 
 AbyssEngine::SDL2::SDL2SystemIO::SDL2SystemIO()
-    : AbyssEngine::SystemIO::SystemIO(), _runMainLoop(false), _audioBuffer(AudioBufferSize), _audioSpec() {
+    : AbyssEngine::SystemIO::SystemIO(), _runMainLoop(false), _audioBuffer(AudioBufferSize), _audioSpec(), _videoMutex(), _videoNode() {
     SPDLOG_TRACE("Creating SDL2 System IO");
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_AUDIO) != 0)
@@ -108,6 +109,10 @@ void AbyssEngine::SDL2::SDL2SystemIO::RunMainLoop(Node &rootNode) {
         while (SDL_PollEvent(&sdlEvent)) {
             HandleSdlEvent(sdlEvent, rootNode);
         }
+
+        if (!_runMainLoop)
+            break;
+
         {
             std::lock_guard<std::mutex> guard(_mutex);
 
@@ -142,6 +147,9 @@ void AbyssEngine::SDL2::SDL2SystemIO::HandleSdlEvent(const SDL_Event &sdlEvent, 
 
         break;
     case SDL_QUIT:
+        if (_videoNode.get() != nullptr) {
+            NotifyVideoFinished();
+        }
         _runMainLoop = false;
         break;
     }
@@ -187,6 +195,31 @@ void AbyssEngine::SDL2::SDL2SystemIO::FinalizeAudio() const {
     if (!_hasAudio)
         return;
 
+    SDL_PauseAudioDevice(_audioDeviceId, SDL_TRUE);
     SDL_CloseAudioDevice(_audioDeviceId);
 }
 void AbyssEngine::SDL2::SDL2SystemIO::PushAudioData(std::span<const char> data) { _audioBuffer.PushData(data); }
+
+void AbyssEngine::SDL2::SDL2SystemIO::PlayVideo(LibAbyss::InputStream stream, bool wait) {
+    _videoMutex.lock();
+    _waitVideoPlayback = wait;
+
+    _videoNode = std::make_unique<Video>(std::move(stream));
+}
+
+void AbyssEngine::SDL2::SDL2SystemIO::WaitForVideoToFinish() {
+    if (!_waitVideoPlayback)
+        return;
+
+    _videoMutex.lock();
+    _videoMutex.unlock();
+}
+
+void AbyssEngine::SDL2::SDL2SystemIO::NotifyVideoFinished() {
+    _videoNode = nullptr;
+
+    if (!_waitVideoPlayback)
+        return;
+
+    _videoMutex.unlock();
+}

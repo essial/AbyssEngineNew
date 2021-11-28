@@ -22,7 +22,8 @@
                 "avformat",
                 "avresample",
                 "swscale",
-                "swresample"
+                "swresample",
+                "ffmpeg"
             ]
         }, {
             "name": "abseil",

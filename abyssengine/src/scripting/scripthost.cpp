@@ -39,6 +39,7 @@ AbyssEngine::ScriptHost::ScriptHost(Engine *engine) : _lua(), _engine(engine) {
     _environment.set_function("fileExists", &ScriptHost::LuaFileExists, this);
     _environment.set_function("setCursor", &ScriptHost::LuaSetCursor, this);
     _environment.set_function("getRootNode", &ScriptHost::LuaGetRootNode, this);
+    _environment.set_function("playVideo", &ScriptHost::LuaPlayVideo, this);
 
     auto spriteObject = _environment.set_function("loadSprite", &ScriptHost::LuaLoadSprite, this);
 
@@ -209,3 +210,10 @@ void AbyssEngine::ScriptHost::LuaSetCursor(Sprite &sprite, int offsetX, int offs
 }
 
 AbyssEngine::Node &AbyssEngine::ScriptHost::LuaGetRootNode() { return AbyssEngine::Engine::Get()->GetRootNode(); }
+
+void AbyssEngine::ScriptHost::LuaPlayVideo(std::string_view videoPath, bool wait) {
+    auto stream = _engine->GetLoader().Load(std::filesystem::path(videoPath));
+    _engine->GetSystemIO().PlayVideo(std::move(stream), wait);
+    if (wait)
+        _engine->GetSystemIO().WaitForVideoToFinish();
+}
