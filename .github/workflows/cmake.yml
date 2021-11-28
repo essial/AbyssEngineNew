@@ -47,14 +47,9 @@ jobs:
 
       - name: Install Deps (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get install nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
-
-      - name: Set up Clang (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
-        uses: egor-tensin/setup-clang@v1
-        with:
-          version: latest
-          platform: x64
+        run: >-
+          sudo apt-get install g++-10 nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
 
       - name: Install Deps (MacOS)
         if: matrix.os == 'macos-11'
