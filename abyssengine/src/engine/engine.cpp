@@ -7,7 +7,8 @@
 AbyssEngine::Engine *_engineGlobalInstance = nullptr;
 
 AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO> systemIo)
-    : _iniFile(std::move(iniFile)), _systemIO(std::move(systemIo)), _loader(), _palettes() {
+    : _iniFile(std::move(iniFile)), _systemIO(std::move(systemIo)), _loader(), _palettes(),
+    _scriptHost(std::make_unique<ScriptHost>(this)) {
     SPDLOG_TRACE("creating engine");
     _engineGlobalInstance = this;
     _systemIO->SetFullscreen(_iniFile.GetValueBool("Video", "FullScreen"));
@@ -26,9 +27,8 @@ AbyssEngine::Engine::~Engine() { SPDLOG_TRACE("destroying engine"); }
 void AbyssEngine::Engine::ScriptingThread() {
     SPDLOG_TRACE("Scripting thread started");
 
-    ScriptHost scriptHost(this);
     try {
-        scriptHost.ExecuteFile("bootstrap.lua");
+        _scriptHost->ExecuteFile("bootstrap.lua");
     } catch (std::exception &ex) {
         SPDLOG_ERROR("Lua Error:\n{0}", ex.what());
         AbyssEngine::HostNotify::Notify(AbyssEngine::eNotifyType::Fatal, "Script Error", ex.what());

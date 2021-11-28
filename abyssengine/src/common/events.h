@@ -1,10 +1,11 @@
 #ifndef ABYSS_EVENTS_H
 #define ABYSS_EVENTS_H
 
+#include <variant>
+
 namespace AbyssEngine {
 
 enum class eMouseButton { Left, Right, Middle };
-enum class eMouseEventType { Move, Button };
 
 struct MouseMoveEvent {
     int X;
@@ -16,13 +17,7 @@ struct MouseButtonEvent {
     bool IsPressed;
 };
 
-struct MouseEventInfo {
-    eMouseEventType EventType;
-    union Event {
-        MouseMoveEvent MoveEvent;
-        MouseButtonEvent ButtonEvent;
-    };
-};
+using MouseEvent = std::variant<MouseMoveEvent, MouseButtonEvent>;
 
 }
 

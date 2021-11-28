@@ -61,8 +61,8 @@ void AbyssEngine::Sprite::RenderCallback(int offsetX, int offsetY) {
     Node::RenderCallback(offsetX, offsetY);
 }
 
-void AbyssEngine::Sprite::MouseEventCallback(AbyssEngine::MouseEventInfo eventInfo) {
-    Node::MouseEventCallback(eventInfo);
+void AbyssEngine::Sprite::MouseEventCallback(const AbyssEngine::MouseEvent& event) {
+    Node::MouseEventCallback(event);
 }
 
 void AbyssEngine::Sprite::Animate(float elapsed) {

@@ -18,7 +18,7 @@ class Sprite : public Node {
 
     void UpdateCallback(uint32_t ticks) final;
     void RenderCallback(int offsetX, int offsetY) final;
-    void MouseEventCallback(MouseEventInfo eventInfo) final;
+    void MouseEventCallback(const MouseEvent& event) final;
 
     virtual void GetFrameOffset(uint32_t frame, int &offsetX, int &offsetY) = 0;
     virtual void GetFrameSize(uint32_t frame, uint32_t &width, uint32_t &height) = 0;

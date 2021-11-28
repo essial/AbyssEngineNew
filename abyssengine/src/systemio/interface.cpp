@@ -1,7 +1,7 @@
 #include "interface.h"
 #include "../node/sprite.h"
 
-void AbyssEngine::SystemIO::SetCursorSprite (Sprite *cursorSprite, int offsetX, int offsetY) {
+void AbyssEngine::SystemIO::SetCursorSprite (Sprite* cursorSprite, int offsetX, int offsetY) {
     std::lock_guard<std::mutex> guard(_mutex);
     _cursorSprite = cursorSprite;
     _cursorOffsetX = offsetX;

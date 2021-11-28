@@ -13,7 +13,7 @@ class Node {
 
     virtual void UpdateCallback(uint32_t ticks);
     virtual void RenderCallback(int offsetX, int offsetY);
-    virtual void MouseEventCallback(MouseEventInfo eventInfo){};
+    virtual void MouseEventCallback(const MouseEvent& event) {}
     void GetEffectiveLayout(int &x, int &y);
     void AppendChild(std::unique_ptr<Node> childNode);
     void RemoveChild(Node *nodeRef);
@@ -24,7 +24,7 @@ class Node {
     bool Active = true;
 
     Node *Parent = nullptr;
-    std::vector<std::unique_ptr<Node>> Children = std::vector<std::unique_ptr<Node>>();
+    std::vector<std::unique_ptr<Node>> Children;
 };
 
 } // namespace AbyssEngine

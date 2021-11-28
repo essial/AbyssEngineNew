@@ -6,6 +6,7 @@
 #include "../node/dc6sprite.h"
 #include <absl/strings/ascii.h>
 #include <filesystem>
+#include <memory>
 #include <sol/sol.hpp>
 #include <spdlog/spdlog.h>
 
@@ -61,7 +62,9 @@ std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadString(cons
     return std::make_tuple(func, sol::nil);
 }
 
-void AbyssEngine::ScriptHost::ExecuteFile(std::string_view path) { LuaLoadFile(path); }
+void AbyssEngine::ScriptHost::ExecuteFile(std::string_view path) {
+    LuaLoadFile(path);
+}
 
 std::tuple<sol::object, sol::object> AbyssEngine::ScriptHost::LuaLoadFile(std::string_view pathStr) {
     std::filesystem::path path(pathStr);
@@ -185,7 +188,7 @@ bool AbyssEngine::ScriptHost::LuaFileExists(std::string_view fileName) {
     auto path = std::filesystem::path(fileName);
     return _engine->GetLoader().FileExists(path);
 }
-AbyssEngine::Sprite* AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
+std::unique_ptr<AbyssEngine::Sprite> AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spritePath, std::string_view paletteName) {
     const auto &engine = AbyssEngine::Engine::Get();
     const std::filesystem::path path(spritePath);
 
@@ -196,7 +199,7 @@ AbyssEngine::Sprite* AbyssEngine::ScriptHost::LuaLoadSprite(std::string_view spr
     const auto &palette = engine->GetPalette(paletteName);
 
     if (absl::AsciiStrToLower(spritePath).ends_with(".dc6")) {
-        return new DC6Sprite(stream, palette);
+        return std::make_unique<DC6Sprite>(stream, palette);
     } else
         throw std::runtime_error(absl::StrCat("Unknowns sprite format for file: ", spritePath));
 }
