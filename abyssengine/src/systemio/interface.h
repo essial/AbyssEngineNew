@@ -5,6 +5,7 @@
 #include <vector>
 #include <span>
 #include <mutex>
+#include <memory>
 #include "../common/rectangle.h"
 
 namespace AbyssEngine {
