@@ -3,12 +3,19 @@ cmake_minimum_required(VERSION 3.20)
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
     set(VCPKG_BUILD_TYPE release)
-endif()
+endif ()
 
-if(MSVC)
+if (MSVC)
     # TODO: remove this when depending on CASC
     add_definitions(-DCASCLIB_NO_AUTO_LINK_LIBRARY)
-endif(MSVC)
+endif (MSVC)
+
+if (UNIX)
+    if (APPLE)
+    else ()
+        add_definitions(-std=c++20)
+    endif ()
+endif ()
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
