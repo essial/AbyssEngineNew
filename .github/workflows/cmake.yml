@@ -58,7 +58,7 @@ jobs:
 
       - name: Install Deps (MacOS)
         if: matrix.os == 'macos-11'
-        run: brew install nasm ffmpeg
+        run: brew install nasm ffmpeg  && echo "CC=/Users/runner/work/AbyssEngineNew/AbyssEngineNew/llvm/bin/clang" >> $GITHUB_ENV && echo "CXX=/Users/runner/work/AbyssEngineNew/AbyssEngineNew/llvm/bin/clang++" >> $GITHUB_ENV
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10
