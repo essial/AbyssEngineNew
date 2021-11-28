@@ -48,7 +48,7 @@ jobs:
 
       - name: Install Deps (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get install gcc-10 gcc-10-base gcc-10-doc g++-10 libstdc++-10-dev nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
+        run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get install gcc-10 gcc-10-base gcc-10-doc g++-10 libstdc++-10-dev nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev libstdc++-10-dev
 
       - name: Install Deps (MacOS)
         if: matrix.os == 'macos-11'
