@@ -58,13 +58,8 @@ jobs:
                     sudo apt-get update
                     sudo apt-get install llvm-13 clang-13 --install-suggests
                     sudo apt-get install nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
-                    export CC=clang
-                    export CXX=clang++
-                    export LINKER=llvm-ld
-                    export AR=llvm-ar
-                    export NM=llvm-nm
-                    export OBJDUMP=llvm-objdump
-                    export RANLIB=llvm-ranlib
+                    sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 120 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-13
+            
 
             -   name: Install Deps (MacOS)
                 if: matrix.os == 'macos-11'
@@ -73,12 +68,10 @@ jobs:
             -   name: Run vcpkg
                 uses: lukka/run-vcpkg@v10
                 with:
-                    setupOnly: true
                     vcpkgJsonGlob: "**/vcpkg.json"
                     vcpkgDirectory: "${{ github.workspace }}/vcpkg"
                     vcpkgGitCommitId: "709e9ec32e27319636c047a38744e1ce0e229ae4"
                     appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
-                    additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
 
             -   name: Build
                 uses: lukka/run-cmake@v10
