@@ -10,13 +10,6 @@ if (MSVC)
     add_definitions(-DCASCLIB_NO_AUTO_LINK_LIBRARY)
 endif (MSVC)
 
-if (UNIX)
-    if (APPLE)
-    else ()
-        add_definitions(-std=c++2a)
-    endif ()
-endif ()
-
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if (DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
