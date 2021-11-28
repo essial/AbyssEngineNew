@@ -56,7 +56,8 @@ jobs:
                 run: >-
                     sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
                     sudo apt-get update
-                    sudo apt-get install llvm-13 nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
+                    sudo apt-get install llvm-13 clang-13 --install-suggests
+                    sudo apt-get install nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
 
             -   name: Install Deps (MacOS)
                 if: matrix.os == 'macos-11'
