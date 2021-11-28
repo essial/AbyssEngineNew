@@ -48,12 +48,8 @@ jobs:
       - name: Install Deps (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: >-
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-          sudo apt-get install libc++-10-dev llvm g++-10 nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
-          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-5.0 100
-          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-5.0 100
-          export CC=clang
-          export CXX=clang++
+          sudo apt-get install gcc-10 gcc-10-base gcc-10-doc g++-10 libstdc++-10-dev
+          sudo apt-get install nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
 
       - name: Install Deps (MacOS)
         if: matrix.os == 'macos-11'
