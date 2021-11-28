@@ -52,11 +52,7 @@ jobs:
 
       - name: Install Deps (MacOS)
         if: matrix.os == 'macos-11'
-        run: brew install nasm ffmpeg
-
-      - name: Install Clang (MacOS)
-        if: matrix.os == 'macos-11'
-        run: brew install --with-toolchain llvm
+        run: brew install --with-toolchain llvm && brew install nasm ffmpeg
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v10
