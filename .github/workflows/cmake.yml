@@ -63,7 +63,7 @@ jobs:
 
       - name: Install Clang (Ubuntu)
         if: matrix.os == 'ubuntu-latest' && matrix.cc == 'clang'
-        run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh 13)" && sudo apt-get install libc++-dev && echo "CC=clang-13" >> $GITHUB_ENV && echo "CXX=clang++13" >> $GITHUB_ENV && echo "CXXFLAGS=-stdlib=libc++"
+        run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh 13)" && sudo apt-get install clang++ libc++-dev && echo "CC=clang-13" >> $GITHUB_ENV && echo "CXX=clang++13" >> $GITHUB_ENV && echo "CXXFLAGS=-stdlib=libc++"
 
       - name: Install LLVM and Clang (MacOS)
         if: matrix.os == 'macos-11'
