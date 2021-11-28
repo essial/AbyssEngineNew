@@ -3,6 +3,7 @@
 
 #include "inputstream.h"
 #include <cstdint>
+#include <concepts>
 
 namespace LibAbyss {
 class StreamReader {
