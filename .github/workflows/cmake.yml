@@ -1,4 +1,4 @@
-name: cmake-workflow
+name: CI
 on:
   - push
   - pull_request
