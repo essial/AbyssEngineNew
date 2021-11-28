@@ -52,6 +52,8 @@ jobs:
           sudo apt-get install libc++-10-dev llvm g++-10 nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
           sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-5.0 100
           sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-5.0 100
+          export CC=clang
+          export CXX=clang++
 
       - name: Install Deps (MacOS)
         if: matrix.os == 'macos-11'
