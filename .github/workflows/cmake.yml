@@ -17,11 +17,6 @@ jobs:
           - name: Ubuntu GCC
             os: ubuntu-latest
             triplet: x64-linux
-            cc: gcc
-          - name: Ubuntu Clang
-            os: ubuntu-latest
-            triplet: x64-linux
-            cc: clang
           - name: MacOS
             os: macos-11
             triplet: x64-osx
@@ -58,12 +53,8 @@ jobs:
         run: sudo apt-get install nasm libxext-dev libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev
 
       - name: Install GCC (Ubuntu)
-        if: matrix.os == 'ubuntu-latest' && matrix.cc == 'gcc'
+        if: matrix.os == 'ubuntu-latest'
         run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get install g++-10 libstdc++-10-dev && echo "CC=gcc-10" >> $GITHUB_ENV && echo "CXX=g++-10" >> $GITHUB_ENV
-
-      - name: Install Clang (Ubuntu)
-        if: matrix.os == 'ubuntu-latest' && matrix.cc == 'clang'
-        run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh 13)" && sudo apt-get install clang++ libc++-dev && echo "CC=clang-13" >> $GITHUB_ENV && echo "CXX=clang++13" >> $GITHUB_ENV && echo "CXXFLAGS=-stdlib=libc++"
 
       - name: Install LLVM and Clang (MacOS)
         if: matrix.os == 'macos-11'
