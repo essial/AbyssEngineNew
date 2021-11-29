@@ -1,6 +1,7 @@
 #include "video.h"
 #include "../engine/engine.h"
 #include <absl/strings/ascii.h>
+#include <ios>
 
 namespace {
 const int EncodeBufferSize = 1024 * 32;
