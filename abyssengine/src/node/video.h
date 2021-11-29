@@ -24,7 +24,7 @@ namespace AbyssEngine {
 
 class Video : public Node {
   public:
-    Video(LibAbyss::InputStream stream);
+    explicit Video(LibAbyss::InputStream stream);
     ~Video() override;
 
     void UpdateCallback(uint32_t ticks) final;
@@ -68,6 +68,8 @@ class Video : public Node {
     Rectangle _sourceRect;
     Rectangle _targetRect;
     bool _isPlaying = true;
+    bool _framesReady = false;
+    uint32_t _totalTicks = 0;
 };
 } // namespace AbyssEngine
 

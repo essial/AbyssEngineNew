@@ -41,7 +41,7 @@ AbyssEngine::SpriteFont::SpriteFont(std::string_view filePath, std::string_view 
 
         dataStream.ignore(1); // Skip a byte for some reason
 
-        Glyph glyph {};
+        Glyph glyph{};
         glyph.Width = sr.ReadUInt8();
         glyph.Height = sr.ReadUInt8();
 
@@ -81,8 +81,6 @@ void AbyssEngine::SpriteFont::RegenerateAtlas() {
             atlasHeight += curHeight;
             curX = 0;
             curHeight = 0;
-        } else {
-            atlasWidth = curX + (int)frame.Width;
         }
 
         curX += (int)frame.Width;
@@ -97,25 +95,24 @@ void AbyssEngine::SpriteFont::RegenerateAtlas() {
     std::vector<uint32_t> buffer;
     buffer.resize(atlasWidth * atlasHeight);
 
-    int start_x = 0;
-    int start_y = 0;
+    int startX = 0;
+    int startY = 0;
     curHeight = 0;
 
     for (auto frameIdx = 0; frameIdx < _dc6->FramesPerDirection; frameIdx++) {
         const auto &frame = direction.Frames[frameIdx];
-
         auto &frameRect = _frameRects[frameIdx];
 
-        if (start_x + (int)frame.Width > MaxSpriteFontAtlasWidth) {
-            start_x = 0;
-            start_y += curHeight;
+        if (startX + (int)frame.Width > MaxSpriteFontAtlasWidth) {
+            startX = 0;
+            startY += curHeight;
             curHeight = 0;
         }
 
-        frameRect.rect.X = start_x;
-        frameRect.rect.Y = start_y;
-        frameRect.rect.Width = (int)frame.Width;
-        frameRect.rect.Height = (int)frame.Height;
+        frameRect.Rect.X = startX;
+        frameRect.Rect.Y = startY;
+        frameRect.Rect.Width = (int)frame.Width;
+        frameRect.Rect.Height = (int)frame.Height;
         frameRect.OffsetX = frame.OffsetX;
         frameRect.OffsetY = frame.OffsetY;
 
@@ -125,7 +122,7 @@ void AbyssEngine::SpriteFont::RegenerateAtlas() {
                     continue;
 
                 const auto &color = _palette.BasePalette[frame.IndexData[x + (y * frame.Width)]];
-                const auto bufferIndex = start_x + x + ((start_y + y) * atlasWidth);
+                const auto bufferIndex = startX + x + ((startY + y) * atlasWidth);
 
                 if (bufferIndex >= buffer.size())
                     throw std::runtime_error("buffer index out of range");
@@ -134,10 +131,66 @@ void AbyssEngine::SpriteFont::RegenerateAtlas() {
             }
         }
 
-        start_x += (int)frame.Width;
+        startX += (int)frame.Width;
         curHeight = (curHeight < (int)frame.Height) ? (int)frame.Height : curHeight;
 
         _atlas->SetPixels(buffer);
-        // TODO: Set Blend Mode
+    }
+}
+void AbyssEngine::SpriteFont::GetMetrics(std::string_view text, int &width, int &height) {
+    auto x = 0;
+    auto rowHeight = 0;
+    width = 0;
+    height = 0;
+
+    for (auto ch : text) {
+        const auto &glyph = &_glyphs[(int)ch];
+
+        if (ch == '\n') {
+            x = 0;
+            height += rowHeight;
+            rowHeight = 0;
+
+            continue;
+        }
+
+        rowHeight = (rowHeight < glyph->Height) ? glyph->Height : rowHeight;
+        x += glyph->Width;
+        width = (x > width) ? x : width;
+    }
+
+    height += rowHeight;
+}
+void AbyssEngine::SpriteFont::DrawText(int x, int y, std::string_view text, AbyssEngine::eBlendMode blendMode, AbyssEngine::RGB colorMod) {
+    if (_atlas == nullptr)
+        RegenerateAtlas();
+
+    _atlas->SetBlendMode(blendMode);
+    _atlas->SetColorMod(colorMod.Red, colorMod.Green, colorMod.Blue);
+
+    Rectangle targetRect{.X = x, .Y = y, .Width = 0, .Height = 0};
+    const auto startX = x;
+    auto maxHeight = 0;
+
+    for (const auto &ch : text) {
+        const auto &glyph = _glyphs[(int)ch];
+
+        if (ch == '\n') {
+            targetRect.X = startX;
+            targetRect.Y = maxHeight;
+            maxHeight = 0;
+
+            continue;
+        }
+
+        if (ch != ' ') {
+            const auto &frame = _frameRects[glyph.FrameIndex];
+            targetRect.Width = frame.Rect.Width;
+            targetRect.Height = frame.Rect.Height;
+            maxHeight = (maxHeight < glyph.Height) ? glyph.Height : maxHeight;
+            _atlas->Render(frame.Rect, targetRect);
+        }
+
+        targetRect.X += glyph.Width;
     }
 }

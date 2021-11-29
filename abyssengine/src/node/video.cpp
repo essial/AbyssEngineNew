@@ -1,7 +1,9 @@
 #include "video.h"
+#include "../common/overload.h"
 #include "../engine/engine.h"
 #include <absl/strings/ascii.h>
 #include <ios>
+#include <spdlog/spdlog.h>
 
 namespace {
 const int DecodeBufferSize = 1024 * 32;
@@ -12,6 +14,7 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
       _uPlane(), _vPlane(), _avFrame(), _videoTexture(), _sourceRect(), _targetRect() {
 
     _avBuffer = (unsigned char *)av_malloc(DecodeBufferSize); // AVIO is going to free this automagically... because why not?
+    memset(_avBuffer, 0, DecodeBufferSize);
 
     _avioContext =
         avio_alloc_context(_avBuffer, DecodeBufferSize, 0, this, &Video::VideoStreamReadCallback, nullptr, &Video::VideoStreamSeekCallback);
@@ -108,6 +111,8 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
 
     _avFrame = av_frame_alloc();
     _videoTimestamp = av_gettime();
+
+    Engine::Get()->GetSystemIO().ResetAudio();
 }
 
 AbyssEngine::Video::~Video() {
@@ -122,6 +127,7 @@ AbyssEngine::Video::~Video() {
 }
 
 void AbyssEngine::Video::UpdateCallback(uint32_t ticks) {
+    _totalTicks += ticks;
     while (_isPlaying) {
         const auto diff = av_gettime() - _videoTimestamp;
         if (diff < _microsPerFrame)
@@ -136,12 +142,23 @@ void AbyssEngine::Video::UpdateCallback(uint32_t ticks) {
 }
 
 void AbyssEngine::Video::RenderCallback(int offsetX, int offsetY) {
-    _videoTexture->Render(_sourceRect, _targetRect);
-    Node::RenderCallback(offsetX, offsetY);
+    if (_framesReady)
+        _videoTexture->Render(_sourceRect, _targetRect);
+
+    Node::RenderCallback(X + offsetX, Y + offsetY);
 }
 
 void AbyssEngine::Video::MouseEventCallback(const AbyssEngine::MouseEvent &event) {
-    //
+    std::visit(Overload{[](const MouseMoveEvent &evt) {},
+                        [this](const MouseButtonEvent &evt) {
+                            if (!evt.IsPressed || (evt.Button != eMouseButton::Left) || (_totalTicks < 1000))
+                                return;
+
+                            _isPlaying = false;
+                            Engine::Get()->GetSystemIO().ResetAudio();
+                        }},
+               event);
+
     Node::MouseEventCallback(event);
 }
 int AbyssEngine::Video::VideoStreamRead(uint8_t *buffer, int size) {
@@ -217,6 +234,8 @@ bool AbyssEngine::Video::ProcessFrame() {
         lineSize[0] = _videoCodecContext->width;
         lineSize[1] = _uvPitch;
         lineSize[2] = _uvPitch;
+
+        _framesReady = true;
 
         sws_scale(_swsContext, (const unsigned char *const *)_avFrame->data, _avFrame->linesize, 0, _videoCodecContext->height, data, lineSize);
         _videoTexture->SetYUVData(_yPlane, _videoCodecContext->width, _uPlane, _uvPitch, _vPlane, _uvPitch);

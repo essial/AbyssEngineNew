@@ -25,6 +25,7 @@ class SDL2SystemIO : public SystemIO {
     void PushAudioData(std::span<uint8_t> data) final;
     void PlayVideo(LibAbyss::InputStream stream, bool wait) final;
     void WaitForVideoToFinish() final;
+    void ResetAudio() override;
 
   private:
     void InitializeAudio();

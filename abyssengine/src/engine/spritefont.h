@@ -5,6 +5,7 @@
 #include "../systemio/interface.h"
 #include "libabyss/dc6.h"
 #include "libabyss/palette.h"
+#include "../common/color.h"
 #include <string>
 
 namespace AbyssEngine {
@@ -18,12 +19,14 @@ class SpriteFont {
     };
 
     struct FramePosition {
-        Rectangle rect;
+        Rectangle Rect;
         int OffsetX;
         int OffsetY;
     };
 
     SpriteFont(std::string_view filePath, std::string_view paletteName);
+    void GetMetrics(std::string_view text, int &width, int &height);
+    void DrawText(int x, int y, std::string_view text, eBlendMode blendMode, RGB colorMod);
 
   private:
     void RegenerateAtlas();

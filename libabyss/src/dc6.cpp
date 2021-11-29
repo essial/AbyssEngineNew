@@ -9,7 +9,7 @@ const int RunOfTransparentPixels = 2;
 const int RunOfOpaquePixels = 3;
 } // namespace
 
-LibAbyss::DC6::DC6(LibAbyss::InputStream &stream) : Directions() {
+LibAbyss::DC6::DC6(LibAbyss::InputStream &stream) : Directions(), Termination() {
     StreamReader sr(stream);
 
     Version = sr.ReadInt32();

@@ -140,6 +140,7 @@ void AbyssEngine::SDL2::SDL2SystemIO::RunMainLoop(Node &rootNode) {
                 }
                 _videoNode->RenderCallback(0, 0);
             } else {
+                rootNode.UpdateCallback(tickDiff);
                 rootNode.RenderCallback(0, 0);
 
                 if (_showSystemCursor && _cursorSprite != nullptr) {
@@ -156,8 +157,10 @@ void AbyssEngine::SDL2::SDL2SystemIO::RunMainLoop(Node &rootNode) {
 }
 
 void AbyssEngine::SDL2::SDL2SystemIO::HandleSdlEvent(const SDL_Event &sdlEvent, Node &rootNode) {
+    auto &targetNode = (_videoNode != nullptr) ? *_videoNode : rootNode;
+
     switch (sdlEvent.type) {
-    case SDL_MOUSEMOTION:
+    case SDL_MOUSEMOTION: {
         _cursorX = sdlEvent.motion.x;
         _cursorY = sdlEvent.motion.y;
 
@@ -167,13 +170,52 @@ void AbyssEngine::SDL2::SDL2SystemIO::HandleSdlEvent(const SDL_Event &sdlEvent, 
         _cursorSprite->X = _cursorX;
         _cursorSprite->Y = _cursorY;
 
-        break;
+        targetNode.MouseEventCallback(MouseMoveEvent{.X = sdlEvent.motion.x, .Y = sdlEvent.motion.y});
+    }
+        return;
+    case SDL_MOUSEBUTTONDOWN: {
+        eMouseButton button;
+        switch (sdlEvent.button.button) {
+        case SDL_BUTTON_LEFT:
+            button = eMouseButton::Left;
+            break;
+        case SDL_BUTTON_MIDDLE:
+            button = eMouseButton::Middle;
+            break;
+        case SDL_BUTTON_RIGHT:
+            button = eMouseButton::Right;
+            break;
+        default:
+            return;
+        }
+        targetNode.MouseEventCallback(MouseButtonEvent{.Button = button, .IsPressed = true});
+    }
+        return;
+    case SDL_MOUSEBUTTONUP: {
+        eMouseButton button;
+        switch (sdlEvent.button.button) {
+        case SDL_BUTTON_LEFT:
+            button = eMouseButton::Left;
+            break;
+        case SDL_BUTTON_MIDDLE:
+            button = eMouseButton::Middle;
+            break;
+        case SDL_BUTTON_RIGHT:
+            button = eMouseButton::Right;
+            break;
+        default:
+            return;
+        }
+
+        targetNode.MouseEventCallback(MouseButtonEvent{.Button = button, .IsPressed = false});
+    }
+        return;
     case SDL_QUIT:
         if (_videoNode != nullptr)
             _videoNode->StopVideo();
         _videoMutex.unlock();
         _runMainLoop = false;
-        break;
+        return;
     }
 }
 
@@ -248,3 +290,4 @@ void AbyssEngine::SDL2::SDL2SystemIO::WaitForVideoToFinish() {
     }
     _videoMutex.unlock();
 }
+void AbyssEngine::SDL2::SDL2SystemIO::ResetAudio() { _audioBuffer.Reset(); }

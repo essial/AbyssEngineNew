@@ -40,7 +40,7 @@ namespace LibAbyss {
         uint8_t Alpha;
 
         explicit operator uint32_t() const {
-            return ((uint32_t)Blue) | ((uint32_t)Green << 8) | ((uint32_t)Red << 16) | ((uint32_t)Alpha << 24);
+            return ((uint32_t)Red) | ((uint32_t)Green << 8) | ((uint32_t)Blue << 16) | ((uint32_t)Alpha << 24);
         }
     };
 

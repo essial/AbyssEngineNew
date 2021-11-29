@@ -79,6 +79,9 @@ void AbyssEngine::DC6Sprite::RegenerateAtlas() {
             directionMaxHeight = (directionMaxHeight < frame.Height) ? frame.Height : directionMaxHeight;
             startX += (int)frame.Width;
         }
+
+        startX = 0;
+        startY += (int)directionMaxHeight;
     }
 
     _atlas->SetPixels(buffer);

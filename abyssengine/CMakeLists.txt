@@ -110,6 +110,9 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/engine/spritefont.cpp
         src/common/inifile.cpp
         src/common/ringbuffer.cpp
+        src/common/alignment.cpp
+        src/common/blendmode.cpp
+        src/common/color.cpp
         src/systemio/interface.cpp
 
         # Nodes --------------------------------------------------------
@@ -117,6 +120,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/node/sprite.cpp
         src/node/dc6sprite.cpp
         src/node/video.cpp
+        src/node/label.cpp
 
         # Scripting ----------------------------------------------------
         src/scripting/scripthost.cpp

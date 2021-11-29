@@ -5,7 +5,7 @@ void AbyssEngine::Node::UpdateCallback(uint32_t ticks) {
         if (!item->Active)
             continue;
 
-        UpdateCallback(ticks);
+        item->UpdateCallback(ticks);
     }
 }
 
@@ -14,7 +14,7 @@ void AbyssEngine::Node::RenderCallback(int offsetX, int offsetY) {
         if (!item->Active || !item->Visible)
             continue;
 
-        RenderCallback(offsetX, offsetY);
+        item->RenderCallback(X + offsetX, Y + offsetY);
     }
 }
 
@@ -27,15 +27,20 @@ void AbyssEngine::Node::GetEffectiveLayout(int &x, int &y) {
     }
 }
 
-void AbyssEngine::Node::AppendChild(std::unique_ptr<Node> childNode) { Children.push_back(std::move(childNode)); }
+void AbyssEngine::Node::AppendChild(Node *childNode) {
+    if (childNode == nullptr)
+        throw std::runtime_error("Attempted to append null node!");
+
+    Children.push_back(childNode);
+}
 
 void AbyssEngine::Node::RemoveChild(AbyssEngine::Node *nodeRef) {
 
     int idx = -1;
-    for (const auto& node : Children) {
+    for (const auto &node : Children) {
         idx++;
 
-        if (node.get() != nodeRef)
+        if (node != nodeRef)
             continue;
 
         auto it = Children.begin();
@@ -45,3 +50,13 @@ void AbyssEngine::Node::RemoveChild(AbyssEngine::Node *nodeRef) {
         return;
     }
 }
+void AbyssEngine::Node::RemoveAllChildren() { Children.clear(); }
+void AbyssEngine::Node::SetPosition(int x, int y) {
+    X = x;
+    Y = y;
+}
+std::tuple<int, int> AbyssEngine::Node::GetPosition() { return {X, Y}; }
+void AbyssEngine::Node::SetActive(bool active) { Active = active; }
+bool AbyssEngine::Node::GetActive() const { return Active; }
+void AbyssEngine::Node::SetVisible(bool visible) { Visible = visible; }
+bool AbyssEngine::Node::GetVisible() const { return Visible; }

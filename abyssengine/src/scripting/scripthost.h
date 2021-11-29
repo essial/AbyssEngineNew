@@ -38,10 +38,12 @@ class ScriptHost {
     void LuaAddLoaderProvider(std::string_view providerType, std::string_view providerPath);
     void LuaLoadPalette(std::string_view paletteName, std::string_view path);
     bool LuaFileExists(std::string_view fileName);
-    std::unique_ptr<AbyssEngine::Sprite> LuaLoadSprite(std::string_view spritePath, std::string_view paletteName);
+    AbyssEngine::Sprite *LuaLoadSprite(std::string_view spritePath, std::string_view paletteName);
     void LuaSetCursor(Sprite &sprite, int offsetX, int offsetY);
     void LuaPlayVideo(std::string_view videoPath, bool wait);
     Node &LuaGetRootNode();
+    template <class T, typename X> sol::basic_usertype<T, sol::basic_reference<false>> CreateLuaObjectType(std::string_view name, X &&constructor);
+    template <class T> void BindNodeFunctions(sol::basic_usertype<T, sol::basic_reference<false>> &val);
 };
 
 } // namespace AbyssEngine

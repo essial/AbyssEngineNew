@@ -34,7 +34,6 @@ class Engine {
     [[nodiscard]] const LibAbyss::Palette &GetPalette(std::string_view paletteName) const;
 
   private:
-    const std::filesystem::path _basePath;
     Common::INIFile _iniFile;
     Loader _loader;
     std::unique_ptr<AbyssEngine::SystemIO> _systemIO;

@@ -55,7 +55,7 @@ MPQStream::pos_type MPQStream::seekoff(off_type off, std::ios_base::seekdir dir,
         setg(eback(), eback() + newPos - _startOfBlock, egptr());
     } else {
         // Drop buffer, it will be read in underflow
-        SFileSetFilePointer(_mpqFile, newPos, nullptr, 0);
+        SFileSetFilePointer(_mpqFile, (int)newPos, nullptr, 0);
         setg(nullptr, nullptr, nullptr);
         _startOfBlock = newPos;
     }

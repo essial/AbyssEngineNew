@@ -3,13 +3,13 @@
 #include "filesystemprovider.h"
 #include <spdlog/spdlog.h>
 
-AbyssEngine::Engine *_engineGlobalInstance = nullptr;
+AbyssEngine::Engine *engineGlobalInstance = nullptr;
 
 AbyssEngine::Engine::Engine(Common::INIFile iniFile, std::unique_ptr<SystemIO> systemIo)
     : _iniFile(std::move(iniFile)), _systemIO(std::move(systemIo)), _loader(), _palettes(), _scriptHost(std::make_unique<ScriptHost>(this)),
       _rootNode() {
     SPDLOG_TRACE("creating engine");
-    _engineGlobalInstance = this;
+    engineGlobalInstance = this;
     _systemIO->SetFullscreen(_iniFile.GetValueBool("Video", "FullScreen"));
 }
 
@@ -48,7 +48,7 @@ void AbyssEngine::Engine::AddPalette(std::string_view paletteName, const LibAbys
     _palettes.emplace(paletteName, palette);
 }
 
-AbyssEngine::Engine *AbyssEngine::Engine::Get() { return _engineGlobalInstance; }
+AbyssEngine::Engine *AbyssEngine::Engine::Get() { return engineGlobalInstance; }
 
 const LibAbyss::Palette &AbyssEngine::Engine::GetPalette(std::string_view paletteName) const { return _palettes.at(std::string(paletteName)); }
 

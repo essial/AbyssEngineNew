@@ -27,9 +27,9 @@ namespace LibAbyss {
                          std::ios_base::openmode which) override;
 
     private:
-        HANDLE _mpqFile;
+        HANDLE _mpqFile = 0;
         std::streamsize _startOfBlock = 0;
-        char _buffer[2048];
+        char _buffer[2048] = {};
     };
 
 }
