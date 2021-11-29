@@ -39,6 +39,7 @@ class Video : public Node {
     int64_t VideoStreamSeek(int64_t offset, int whence);
     static int64_t VideoStreamSeekCallback(void *opaque, int64_t offset, int whence) { return ((Video *)opaque)->VideoStreamSeek(offset, whence); };
     bool ProcessFrame();
+    static std::string AvErrorCodeToString(int avError);
 
     LibAbyss::InputStream _stream;
 
