@@ -7,13 +7,12 @@ const int DecodeBufferSize = 1024 * 32;
 } // namespace
 
 AbyssEngine::Video::Video(LibAbyss::InputStream stream)
-    : _stream(std::move(stream)), _avBuffer(), _videoBufferData(), _videoStreamIdx(-1), _audioStreamIdx(-1), _videoCodecContext(), _audioCodecContext(),
-      _yPlane(), _uPlane(), _vPlane(), _avFrame(), _videoTexture() {
+    : _stream(std::move(stream)), _avBuffer(), _videoStreamIdx(-1), _audioStreamIdx(-1), _videoCodecContext(), _audioCodecContext(), _yPlane(),
+      _uPlane(), _vPlane(), _avFrame(), _videoTexture(), _sourceRect(), _targetRect() {
 
-    _avBuffer.resize(DecodeBufferSize);
-    _videoBufferData.resize(EncodeBufferSize);
+    _avBuffer = (unsigned char *)av_malloc(DecodeBufferSize); // AVIO is going to free this automagically... because why not?
 
-    _avioContext = avio_alloc_context(_avBuffer.data(), DecodeBufferSize, 0, this, &Video::VideoStreamReadCallback, 0, &Video::VideoStreamSeekCallback);
+    _avioContext = avio_alloc_context(_avBuffer, DecodeBufferSize, 0, this, &Video::VideoStreamReadCallback, 0, &Video::VideoStreamSeekCallback);
 
     _avFormatContext = avformat_alloc_context();
     _avFormatContext->pb = _avioContext;
@@ -24,7 +23,7 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
     if ((avError = avformat_open_input(&_avFormatContext, "", nullptr, nullptr)) < 0)
         throw std::runtime_error("Failed to open AV format context: " + std::string(av_err2str(avError)));
 
-    if ((avError = avformat_find_stream_info(_avFormatContext, NULL)) < 0)
+    if ((avError = avformat_find_stream_info(_avFormatContext, nullptr)) < 0)
         throw std::runtime_error("Failed to find stream info: " + std::string(av_err2str(avError)));
 
     for (auto i = 0; i < _avFormatContext->nb_streams; i++) {
@@ -86,6 +85,11 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
 
         if ((avError = swr_init(_resampleContext)) < 0)
             throw std::runtime_error("Failed to initialize sound re-sampler: " + std::string(av_err2str(avError)));
+
+        const auto ratio = (float)_videoCodecContext->height / (float)_videoCodecContext->width;
+
+        _sourceRect = {.X = 0, .Y = 0, .Width = _videoCodecContext->width, .Height = _videoCodecContext->height};
+        _targetRect = {.X = 0, .Y = (600 / 2) - (int)((float)(800 * ratio) / 2), .Width = 800, .Height = (int)(800 * ratio)};
     }
 
     _videoTexture = Engine::Get()->GetSystemIO().CreateTexture(ITexture::Format::YUV, _videoCodecContext->width, _videoCodecContext->height);
@@ -116,12 +120,21 @@ AbyssEngine::Video::~Video() {
 }
 
 void AbyssEngine::Video::UpdateCallback(uint32_t ticks) {
-    //
+    while (_isPlaying) {
+        const auto diff = av_gettime() - _videoTimestamp;
+        if (diff < _microsPerFrame)
+            break;
+
+        _videoTimestamp += _microsPerFrame;
+        while (!ProcessFrame()) {
+        }
+    }
+
     Node::UpdateCallback(ticks);
 }
 
 void AbyssEngine::Video::RenderCallback(int offsetX, int offsetY) {
-    //
+    _videoTexture->Render(_sourceRect, _targetRect);
     Node::RenderCallback(offsetX, offsetY);
 }
 
@@ -130,6 +143,9 @@ void AbyssEngine::Video::MouseEventCallback(const AbyssEngine::MouseEvent &event
     Node::MouseEventCallback(event);
 }
 int AbyssEngine::Video::VideoStreamRead(uint8_t *buffer, int size) {
+    if (!_isPlaying)
+        return 0;
+
     int read = 0;
 
     while (read < size && !_stream.eof())
@@ -138,9 +154,12 @@ int AbyssEngine::Video::VideoStreamRead(uint8_t *buffer, int size) {
     return read;
 }
 int64_t AbyssEngine::Video::VideoStreamSeek(int64_t offset, int whence) {
+    if (!_isPlaying)
+        return -1;
+
     std::ios_base::seekdir dir;
 
-    switch(whence) {
+    switch (whence) {
     case SEEK_SET:
         dir = std::ios_base::seekdir::beg;
         break;
@@ -150,12 +169,11 @@ int64_t AbyssEngine::Video::VideoStreamSeek(int64_t offset, int whence) {
     case SEEK_END:
         dir = std::ios_base::seekdir::end;
         break;
-    case AVSEEK_SIZE:
-    {
+    case AVSEEK_SIZE: {
         const auto curPos = _stream.tellg();
         _stream.seekg(0, std::ios_base::seekdir::end);
         const auto endPos = _stream.tellg();
-        _stream.seekg(curPos, std::ios_base::seekdir::cur);
+        _stream.seekg(curPos, std::ios_base::seekdir::beg);
         return endPos;
     } break;
     default:
@@ -165,4 +183,76 @@ int64_t AbyssEngine::Video::VideoStreamSeek(int64_t offset, int whence) {
     _stream.seekg(offset, dir);
 
     return 0;
+}
+bool AbyssEngine::Video::ProcessFrame() {
+    if (_avFormatContext == nullptr || !_isPlaying)
+        return false;
+
+    auto& systemIO = Engine::Get()->GetSystemIO();
+
+    AVPacket packet;
+    if (av_read_frame(_avFormatContext, &packet) < 0) {
+        av_packet_unref(&packet);
+        _isPlaying = false;
+        return true;
+    }
+
+    if (packet.stream_index == _videoStreamIdx) {
+        int avError;
+
+        if ((avError = avcodec_send_packet(_videoCodecContext, &packet)) < 0)
+            throw std::runtime_error("Error decoding video packet: " + std::string(av_err2str(avError)));
+
+        if ((avError = avcodec_receive_frame(_videoCodecContext, _avFrame)) < 0)
+            throw std::runtime_error("Error decoding video packet: " + std::string(av_err2str(avError)));
+
+        uint8_t *data[AV_NUM_DATA_POINTERS];
+        data[0] = _yPlane.data();
+        data[1] = _uPlane.data();
+        data[2] = _vPlane.data();
+
+        int lineSize[AV_NUM_DATA_POINTERS];
+        lineSize[0] = _videoCodecContext->width;
+        lineSize[1] = _uvPitch;
+        lineSize[2] = _uvPitch;
+
+        sws_scale(_swsContext, (const unsigned char *const *)_avFrame->data, _avFrame->linesize, 0, _videoCodecContext->height, data, lineSize);
+        _videoTexture->SetYUVData(_yPlane, _videoCodecContext->width, _uPlane, _uvPitch, _vPlane, _uvPitch);
+
+        av_packet_unref(&packet);
+
+        return true;
+    }
+
+    if (packet.stream_index == _audioStreamIdx) {
+        int avError;
+
+        if ((avError = avcodec_send_packet(_audioCodecContext, &packet)) < 0)
+            throw std::runtime_error("Error decoding audio packet: " + std::string(av_err2str(avError)));
+
+        while (true) {
+            if ((avError = avcodec_receive_frame(_audioCodecContext, _avFrame)) < 0) {
+                if (avError == AVERROR(EAGAIN) || avError == AVERROR_EOF)
+                    break;
+
+                throw std::runtime_error("Error decoding audio packet: " + std::string(av_err2str(avError)));
+            }
+
+            const int outSize = av_samples_get_buffer_size(nullptr, _audioCodecContext->channels, _avFrame->nb_samples, AV_SAMPLE_FMT_S16, 1);
+            std::vector<unsigned char> outBuff;
+            outBuff.resize(outSize);
+            uint8_t *outBuffArray[1];
+            outBuffArray[0] = (unsigned char*)outBuff.data();
+            swr_convert(_resampleContext, outBuffArray, _avFrame->nb_samples, (const uint8_t **)_avFrame->data, _avFrame->nb_samples);
+            systemIO.PushAudioData(outBuff);
+        }
+
+        av_packet_unref(&packet);
+        return false;
+    }
+
+    return false;
+}
+void AbyssEngine::Video::StopVideo() {
+    _isPlaying = false;
 }

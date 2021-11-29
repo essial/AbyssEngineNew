@@ -2,6 +2,7 @@
 #define ABYSS_SDL2SYSTEMIO_H
 
 #include "../../common/ringbuffer.h"
+#include "../../node/video.h"
 #include "../interface.h"
 #include <SDL2/SDL.h>
 #include <mutex>
@@ -20,10 +21,9 @@ class SDL2SystemIO : public SystemIO {
     void RunMainLoop(Node &rootNode) final;
     void Stop() final;
     std::unique_ptr<ITexture> CreateTexture(ITexture::Format textureFormat, uint32_t width, uint32_t height) final;
-    void PushAudioData(std::span<const char> data) final;
+    void PushAudioData(std::span<uint8_t> data) final;
     void PlayVideo(LibAbyss::InputStream stream, bool wait) final;
     void WaitForVideoToFinish() final;
-    void NotifyVideoFinished() final;
 
   private:
     void InitializeAudio();
@@ -32,18 +32,19 @@ class SDL2SystemIO : public SystemIO {
     void HandleAudio(uint8_t *stream, int length);
     void HandleSdlEvent(const SDL_Event &sdlEvent, Node &rootNode);
 
-    SDL_Window *_sdlWindow;
-    SDL_Renderer *_sdlRenderer;
+    std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>> _sdlWindow;
+    std::unique_ptr<SDL_Renderer, std::function<void(SDL_Renderer*)>> _sdlRenderer;
 
-    bool _runMainLoop = false;
+    bool _runMainLoop = true;
     bool _hasAudio = false;
     SDL_AudioSpec _audioSpec;
     SDL_AudioDeviceID _audioDeviceId = 0;
     RingBuffer _audioBuffer;
     std::mutex _videoMutex;
     bool _waitVideoPlayback = false;
+    uint32_t _lastTicks = 0;
 
-    std::unique_ptr<Node> _videoNode;
+    std::unique_ptr<Video> _videoNode;
 };
 
 } // namespace AbyssEngine::SDL2

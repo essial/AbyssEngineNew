@@ -9,17 +9,17 @@ namespace AbyssEngine {
 class RingBuffer {
   public:
     RingBuffer(uint32_t bufferSize);
-    void PushData(std::span<const char> data);
-    void ReadData(char *outBuffer, uint32_t size);
+    void PushData(std::span<uint8_t> data);
+    void ReadData(uint8_t *outBuffer, uint32_t size);
 
   private:
     const uint32_t _bufferSize;
 
     uint32_t _writePosition;
     uint32_t _readPosition;
-    uint32_t _remaining;
+    uint32_t _remainingToRead;
 
-    std::vector<char> _buffer;
+    std::vector<uint8_t> _buffer;
 };
 }
 

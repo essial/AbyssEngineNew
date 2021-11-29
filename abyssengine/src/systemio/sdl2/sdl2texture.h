@@ -1,8 +1,8 @@
 #ifndef ABYSS_SDL2TEXTURE_H
 #define ABYSS_SDL2TEXTURE_H
 
-#include <SDL2/SDL.h>
 #include "../interface.h"
+#include <SDL2/SDL.h>
 
 namespace AbyssEngine::SDL2 {
 
@@ -12,8 +12,7 @@ class SDL2Texture : public ITexture {
     ~SDL2Texture() override;
     void SetPixels(std::span<const uint32_t> pixels) final;
     void Render(const AbyssEngine::Rectangle &sourceRect, const AbyssEngine::Rectangle &destRect) final;
-    void SetYUVData(const Rectangle &rect, std::span<uint8_t> yPlane, int yPitch, std::span<uint8_t> uPlane, int uPitch, std::span<uint8_t> vPlane,
-                    int vPitch) final;
+    void SetYUVData(std::span<uint8_t> yPlane, int yPitch, std::span<uint8_t> uPlane, int uPitch, std::span<uint8_t> vPlane, int vPitch) final;
 
   private:
     SDL_Renderer *_renderer;
@@ -23,6 +22,6 @@ class SDL2Texture : public ITexture {
     const ITexture::Format _textureFormat;
 };
 
-}
+} // namespace AbyssEngine::SDL2
 
 #endif // ABYSS_SDL2TEXTURE_H

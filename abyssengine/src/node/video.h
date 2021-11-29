@@ -30,12 +30,15 @@ class Video : public Node {
     void UpdateCallback(uint32_t ticks) final;
     void RenderCallback(int offsetX, int offsetY) final;
     void MouseEventCallback(const MouseEvent &event) final;
+    bool GetIsPlaying() const { return _isPlaying; }
+    void StopVideo();
 
   private:
     int VideoStreamRead(uint8_t *buffer, int size);
     static int VideoStreamReadCallback(void *opaque, uint8_t *buffer, int size) { return ((Video *)opaque)->VideoStreamRead(buffer, size); };
     int64_t VideoStreamSeek(int64_t offset, int whence);
     static int64_t VideoStreamSeekCallback(void *opaque, int64_t offset, int whence) { return ((Video *)opaque)->VideoStreamSeek(offset, whence); };
+    bool ProcessFrame();
 
     LibAbyss::InputStream _stream;
 
@@ -48,8 +51,7 @@ class Video : public Node {
     AVCodecContext* _audioCodecContext;
     AVFrame* _avFrame;
 
-    std::vector<unsigned char> _avBuffer;
-    std::vector<unsigned char> _videoBufferData;
+    unsigned char* _avBuffer;
     std::vector<uint8_t> _yPlane;
     std::vector<uint8_t> _uPlane;
     std::vector<uint8_t> _vPlane;
@@ -62,6 +64,9 @@ class Video : public Node {
     int _uvPitch;
     uint64_t _microsPerFrame;
     uint64_t _videoTimestamp;
+    Rectangle _sourceRect;
+    Rectangle _targetRect;
+    bool _isPlaying = true;
 };
 } // namespace AbyssEngine
 

@@ -20,7 +20,7 @@ class ITexture {
 
     virtual ~ITexture() = default;
     virtual void SetPixels(std::span<const uint32_t> pixels) = 0;
-    virtual void SetYUVData(const AbyssEngine::Rectangle &rect, std::span<uint8_t> yPlane, int yPitch, std::span<uint8_t> uPlane, int uPitch,
+    virtual void SetYUVData(std::span<uint8_t> yPlane, int yPitch, std::span<uint8_t> uPlane, int uPitch,
                             std::span<uint8_t> vPlane, int vPitch) = 0;
     virtual void Render(const AbyssEngine::Rectangle &sourceRect, const AbyssEngine::Rectangle &destRect) = 0;
 };
@@ -53,7 +53,7 @@ class SystemIO {
 
     /// Writes data to the audio buffer.
     /// \param data The data to write to the audio buffer.
-    virtual void PushAudioData(std::span<const char> data) = 0;
+    virtual void PushAudioData(std::span<uint8_t> data) = 0;
 
     /// Plays the specified video.
     /// \param stream The video stream
@@ -62,9 +62,6 @@ class SystemIO {
 
     /// When video is playing with wait set to true, this function will wait for video playback to complete.
     virtual void WaitForVideoToFinish() = 0;
-
-    /// Notifies that video playback has finished.
-    virtual void NotifyVideoFinished() = 0;
 
     void SetCursorSprite(Sprite *cursorSprite, int offsetX, int offsetY);
 

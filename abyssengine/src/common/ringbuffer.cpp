@@ -1,10 +1,11 @@
 #include "ringbuffer.h"
-AbyssEngine::RingBuffer::RingBuffer(uint32_t bufferSize) : _bufferSize(bufferSize), _buffer(), _readPosition(0), _writePosition(0), _remaining(0) {
+AbyssEngine::RingBuffer::RingBuffer(uint32_t bufferSize)
+    : _bufferSize(bufferSize), _buffer(), _readPosition(0), _writePosition(0), _remainingToRead(0) {
     _buffer.resize(bufferSize);
 }
-void AbyssEngine::RingBuffer::PushData(std::span<const char> data) {
+void AbyssEngine::RingBuffer::PushData(std::span<uint8_t> data) {
     // Determine the bytes we have left to write before we hit the read position
-    const auto remainingSize = _bufferSize - _remaining;
+    const auto remainingSize = _bufferSize - _remainingToRead;
 
     // Grab the amount of data we are going to write
     const auto toWrite = data.size();
@@ -24,12 +25,12 @@ void AbyssEngine::RingBuffer::PushData(std::span<const char> data) {
         _buffer[writePos++] = data[i];
 
         // Wrap the writer index around to the beginning if we reached the end
-        if (writePos >= _bufferSize)
+        while (writePos >= _bufferSize)
             writePos -= _bufferSize;
     }
 
     // Add data to the data we can now read
-    _remaining += toWrite - overflow;
+    _remainingToRead += toWrite - overflow;
 
     // Update write position
     _writePosition = writePos;
@@ -41,29 +42,26 @@ void AbyssEngine::RingBuffer::PushData(std::span<const char> data) {
     while (_readPosition >= _bufferSize)
         _readPosition -= _bufferSize;
 }
-void AbyssEngine::RingBuffer::ReadData(char *outBuffer, uint32_t size) {
-    if (size == 0 || _remaining == 0) {
+void AbyssEngine::RingBuffer::ReadData(uint8_t *outBuffer, uint32_t size) {
+    const int toRead = (_remainingToRead < size) ? _remainingToRead : size;
+
+    if (size == 0 || toRead == 0) {
         memset(outBuffer, 0, size);
         return;
     }
 
-    auto sizeLeft = size;
     auto readPos = _readPosition;
 
     while (readPos >= _bufferSize)
         readPos -= _bufferSize;
 
-    for (auto i = 0; i < size; i++) {
+    for(auto i = 0; i < toRead; i++) {
         outBuffer[i] = _buffer[readPos++];
-        sizeLeft--;
 
-        if (--_remaining == 0) {
-            // TODO: Maybe warn of a buffer under-run?
-            memset(outBuffer+sizeLeft, 0, sizeLeft);
-            return;
-        }
-
-        if (readPos >= _bufferSize)
+        while (readPos >= _bufferSize)
             readPos -= _bufferSize;
     }
+
+    _readPosition = readPos;
+    _remainingToRead -= toRead;
 }
