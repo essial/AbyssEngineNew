@@ -1,5 +1,6 @@
 #include "video.h"
 #include "../engine/engine.h"
+#include <absl/strings/ascii.h>
 
 namespace {
 const int EncodeBufferSize = 1024 * 32;
@@ -56,10 +57,10 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
 
     _videoCodecContext = avcodec_alloc_context3(videoDecoder);
     if ((avError = avcodec_parameters_to_context(_videoCodecContext, videoCodecPar)) < 0)
-        throw std::runtime_error("Failed to apply parameters to video context: " + std::string(av_err2str(avError)));
+        throw std::runtime_error(absl::StrCat("Failed to apply parameters to video context: ", av_err2str(avError)));
 
     if ((avError = avcodec_open2(_videoCodecContext, videoDecoder, nullptr)) < 0)
-        throw std::runtime_error("Failed to open video context: " + std::string(av_err2str(avError)));
+        throw std::runtime_error(absl::StrCat("Failed to open video context: ",av_err2str(avError)));
 
     if (_audioStreamIdx >= 0) {
         const auto audioCodecPar = _avFormatContext->streams[_audioStreamIdx]->codecpar;
@@ -70,10 +71,10 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
 
         _audioCodecContext = avcodec_alloc_context3(audioDecoder);
         if ((avError = avcodec_parameters_to_context(_audioCodecContext, audioCodecPar)) < 0)
-            throw std::runtime_error("Failed to apply parameters to audio context: " + std::string(av_err2str(avError)));
+            throw std::runtime_error(absl::StrCat("Failed to apply parameters to audio context: ", av_err2str(avError)));
 
         if ((avError = avcodec_open2(_audioCodecContext, audioDecoder, nullptr)) < 0)
-            throw std::runtime_error("Failed to open audio context: " + std::string(av_err2str(avError)));
+            throw std::runtime_error(absl::StrCat("Failed to open audio context: ", av_err2str(avError)));
 
         _resampleContext = swr_alloc();
         av_opt_set_channel_layout(_resampleContext, "in_channel_layout", _audioCodecContext->channel_layout, 0);
@@ -84,7 +85,7 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
         av_opt_set_sample_fmt(_resampleContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
 
         if ((avError = swr_init(_resampleContext)) < 0)
-            throw std::runtime_error("Failed to initialize sound re-sampler: " + std::string(av_err2str(avError)));
+            throw std::runtime_error(absl::StrCat("Failed to initialize sound re-sampler: ", av_err2str(avError)));
 
         const auto ratio = (float)_videoCodecContext->height / (float)_videoCodecContext->width;
 
@@ -201,10 +202,10 @@ bool AbyssEngine::Video::ProcessFrame() {
         int avError;
 
         if ((avError = avcodec_send_packet(_videoCodecContext, &packet)) < 0)
-            throw std::runtime_error("Error decoding video packet: " + std::string(av_err2str(avError)));
+            throw std::runtime_error(absl::StrCat("Error decoding video packet: ", av_err2str(avError)));
 
         if ((avError = avcodec_receive_frame(_videoCodecContext, _avFrame)) < 0)
-            throw std::runtime_error("Error decoding video packet: " + std::string(av_err2str(avError)));
+            throw std::runtime_error(absl::StrCat("Error decoding video packet: ", av_err2str(avError)));
 
         uint8_t *data[AV_NUM_DATA_POINTERS];
         data[0] = _yPlane.data();
@@ -228,14 +229,14 @@ bool AbyssEngine::Video::ProcessFrame() {
         int avError;
 
         if ((avError = avcodec_send_packet(_audioCodecContext, &packet)) < 0)
-            throw std::runtime_error("Error decoding audio packet: " + std::string(av_err2str(avError)));
+            throw std::runtime_error(absl::StrCat("Error decoding audio packet: ", av_err2str(avError)));
 
         while (true) {
             if ((avError = avcodec_receive_frame(_audioCodecContext, _avFrame)) < 0) {
                 if (avError == AVERROR(EAGAIN) || avError == AVERROR_EOF)
                     break;
 
-                throw std::runtime_error("Error decoding audio packet: " + std::string(av_err2str(avError)));
+                throw std::runtime_error(absl::StrCat("Error decoding audio packet: ", av_err2str(avError)));
             }
 
             const int outSize = av_samples_get_buffer_size(nullptr, _audioCodecContext->channels, _avFrame->nb_samples, AV_SAMPLE_FMT_S16, 1);
