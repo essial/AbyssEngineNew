@@ -22,10 +22,10 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
     int avError = 0;
 
     if ((avError = avformat_open_input(&_avFormatContext, "", nullptr, nullptr)) < 0)
-        throw std::runtime_error("Failed to open AV format context: " + std::string(av_err2str(avError)));
+        throw std::runtime_error(absl::StrCat("Failed to open AV format context: ", av_err2str(avError)));
 
     if ((avError = avformat_find_stream_info(_avFormatContext, nullptr)) < 0)
-        throw std::runtime_error("Failed to find stream info: " + std::string(av_err2str(avError)));
+        throw std::runtime_error(absl::StrCat("Failed to find stream info: ", av_err2str(avError)));
 
     for (auto i = 0; i < _avFormatContext->nb_streams; i++) {
         if (_avFormatContext->streams[i]->codecpar->codec_type != AVMEDIA_TYPE_VIDEO)
