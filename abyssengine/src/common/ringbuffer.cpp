@@ -1,4 +1,6 @@
 #include "ringbuffer.h"
+#include <string.h>
+
 AbyssEngine::RingBuffer::RingBuffer(uint32_t bufferSize)
     : _bufferSize(bufferSize), _buffer(), _readPosition(0), _writePosition(0), _remainingToRead(0) {
     _buffer.resize(bufferSize);
