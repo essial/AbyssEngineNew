@@ -4,7 +4,6 @@
 #include <ios>
 
 namespace {
-const int EncodeBufferSize = 1024 * 32;
 const int DecodeBufferSize = 1024 * 32;
 } // namespace
 
@@ -14,13 +13,14 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
 
     _avBuffer = (unsigned char *)av_malloc(DecodeBufferSize); // AVIO is going to free this automagically... because why not?
 
-    _avioContext = avio_alloc_context(_avBuffer, DecodeBufferSize, 0, this, &Video::VideoStreamReadCallback, 0, &Video::VideoStreamSeekCallback);
+    _avioContext =
+        avio_alloc_context(_avBuffer, DecodeBufferSize, 0, this, &Video::VideoStreamReadCallback, nullptr, &Video::VideoStreamSeekCallback);
 
     _avFormatContext = avformat_alloc_context();
     _avFormatContext->pb = _avioContext;
     _avFormatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
 
-    int avError = 0;
+    int avError;
 
     if ((avError = avformat_open_input(&_avFormatContext, "", nullptr, nullptr)) < 0)
         throw std::runtime_error(absl::StrCat("Failed to open AV format context: ", AvErrorCodeToString(avError)));
@@ -78,7 +78,7 @@ AbyssEngine::Video::Video(LibAbyss::InputStream stream)
             throw std::runtime_error(absl::StrCat("Failed to open audio context: ", AvErrorCodeToString(avError)));
 
         _resampleContext = swr_alloc();
-        av_opt_set_channel_layout(_resampleContext, "in_channel_layout", _audioCodecContext->channel_layout, 0);
+        av_opt_set_channel_layout(_resampleContext, "in_channel_layout", (int64_t)_audioCodecContext->channel_layout, 0);
         av_opt_set_channel_layout(_resampleContext, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
         av_opt_set_int(_resampleContext, "in_sample_rate", _audioCodecContext->sample_rate, 0);
         av_opt_set_int(_resampleContext, "out_sample_rate", 44100, 0);
@@ -159,17 +159,17 @@ int64_t AbyssEngine::Video::VideoStreamSeek(int64_t offset, int whence) {
     if (!_isPlaying)
         return -1;
 
-    std::ios_base::seekdir dir;
+    std::ios::seekdir dir;
 
     switch (whence) {
     case SEEK_SET:
-        dir = std::ios_base::seekdir::beg;
+        dir = std::ios::seekdir::beg;
         break;
     case SEEK_CUR:
-        dir = std::ios_base::seekdir::cur;
+        dir = std::ios::seekdir::cur;
         break;
     case SEEK_END:
-        dir = std::ios_base::seekdir::end;
+        dir = std::ios::seekdir::end;
         break;
     case AVSEEK_SIZE: {
         const auto curPos = _stream.tellg();
@@ -177,7 +177,7 @@ int64_t AbyssEngine::Video::VideoStreamSeek(int64_t offset, int whence) {
         const auto endPos = _stream.tellg();
         _stream.seekg(curPos, std::ios_base::seekdir::beg);
         return endPos;
-    } break;
+    }
     default:
         return -1;
     }
@@ -261,5 +261,5 @@ std::string AbyssEngine::Video::AvErrorCodeToString(int avError) {
 
     av_make_error_string(str, 2048, avError);
 
-    return std::string(str);
+    return {str};
 }
