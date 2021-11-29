@@ -163,13 +163,9 @@ int64_t AbyssEngine::Video::VideoStreamSeek(int64_t offset, int whence) {
 
     switch (whence) {
     case SEEK_SET:
-        dir = std::ios_base::seekdir::beg;
-        break;
     case SEEK_CUR:
-        dir = std::ios_base::seekdir::cur;
-        break;
     case SEEK_END:
-        dir = std::ios_base::seekdir::end;
+        dir = (std::ios_base::seekdir)whence;
         break;
     case AVSEEK_SIZE: {
         const auto curPos = _stream.tellg();
