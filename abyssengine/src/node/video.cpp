@@ -175,7 +175,7 @@ int64_t AbyssEngine::Video::VideoStreamSeek(int64_t offset, int whence) {
         const auto curPos = _stream.tellg();
         _stream.seekg(0, std::ios::seekdir::end);
         const auto endPos = _stream.tellg();
-        _stream.seekg(curPos, std::io::seekdir::beg);
+        _stream.seekg(curPos, std::ios::seekdir::beg);
         return endPos;
     }
     default:
