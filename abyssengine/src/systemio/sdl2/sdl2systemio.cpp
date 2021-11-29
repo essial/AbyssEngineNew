@@ -40,7 +40,7 @@ AbyssEngine::SDL2::SDL2SystemIO::SDL2SystemIO()
 #ifdef _WIN32
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
-    SDL_GetWindowWMInfo(_sdlWindow, &wmInfo);
+    SDL_GetWindowWMInfo(_sdlWindow.get(), &wmInfo);
     AbyssEngine::HostNotify::Win32Handle = wmInfo.info.win.window;
 #endif // _WIN32
 #ifdef __APPLE__
