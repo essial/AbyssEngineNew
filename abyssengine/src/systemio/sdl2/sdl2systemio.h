@@ -7,6 +7,7 @@
 #include <SDL2/SDL.h>
 #include <mutex>
 #include <string>
+#include <functional>
 
 namespace AbyssEngine::SDL2 {
 
